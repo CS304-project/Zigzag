@@ -5,11 +5,14 @@ import java.awt.event.KeyListener;
 
 public class Main extends JFrame implements KeyListener {
     private final GLCanvas glCanvas;
+    private final ZigzagGLEventListener listener;
 
     public Main() {
         super("Zigzag");
 
         glCanvas = new GLCanvas();
+        listener = new ZigzagGLEventListener();
+        listener.setGLCanvas(glCanvas);
 
         add(glCanvas);
         setLocationRelativeTo(this);
