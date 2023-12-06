@@ -1,7 +1,5 @@
 import javax.media.opengl.GLCanvas;
 import javax.swing.JFrame;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 public class Main extends JFrame  {
     private final GLCanvas glCanvas;
@@ -13,11 +11,12 @@ public class Main extends JFrame  {
         glCanvas = new GLCanvas();
         listener = new ZigzagGLEventListener();
         listener.setGLCanvas(glCanvas);
+        glCanvas.addGLEventListener(listener);
 
         add(glCanvas);
         setLocationRelativeTo(this);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(500, 889);
+        setSize(1000, 800);
         setVisible(true);
     }
 

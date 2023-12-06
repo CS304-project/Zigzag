@@ -1,3 +1,4 @@
+import Model.Cube;
 import Texture.TextureReader;
 
 import javax.media.opengl.GL;
@@ -7,9 +8,10 @@ import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.geom.Point2D;
 import java.io.IOException;
 
-public class ZigzagGLEventListener implements GLEventListener , KeyListener {
+public class ZigzagGLEventListener implements GLEventListener, KeyListener {
     GLCanvas glCanvas;
     private final String[] textureNames = {
             "Ball//ball.png", "Diamond//WithShadow//Diamond.png", "HowToPlay//Info.png", "Play//Play_button.png",
@@ -62,6 +64,17 @@ public class ZigzagGLEventListener implements GLEventListener , KeyListener {
         gl.glLoadIdentity();
 
         //TODO: Start rendering
+        Cube cube = new Cube(
+                new Point2D.Double(0, 0.1),
+                new Point2D.Double(-0.1, 0),
+                new Point2D.Double(0.1, 0),
+                new Point2D.Double(0, -0.1),
+                new Point2D.Double(0, -0.5),
+                new Point2D.Double(-0.1, -0.4),
+                new Point2D.Double(0.1, -0.4)
+        );
+        cube.drawCube(gl);
+        System.out.println("drawed");
     }
 
     @Override
