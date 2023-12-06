@@ -1,11 +1,19 @@
+import Texture.TextureReader;
+
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLEventListener;
 
 public class ZigzagGLEventListener implements GLEventListener {
-
     GLCanvas glCanvas;
-    public void setGLCanvas(GLCanvas glc){
+    private final String[] textureNames = {
+            "Ball//ball.png", "Diamond//WithShadow//Diamond.png", "HowToPlay//Info.png", "Play//Play_button.png",
+            "Sound//sound_On.png"
+    };
+    private final TextureReader.Texture[] texture = new TextureReader.Texture[textureNames.length];
+    private final int[] textures = new int[textureNames.length];
+
+    public void setGLCanvas(GLCanvas glc) {
 
         this.glCanvas = glc;
     }
