@@ -45,8 +45,8 @@ public class Cube {
         gl.glBegin(gl.GL_QUADS);
         gl.glVertex2d(centralMid.x, centralMid.y);
         gl.glVertex2d(topRight.x, topRight.y);
-        gl.glVertex2d(topRight.x, topRight.y - 0.4);
-        gl.glVertex2d(centralMid.x, centralMid.y - 0.4);
+        gl.glVertex2d(topRight.x, topRight.y - 0.3);
+        gl.glVertex2d(centralMid.x, centralMid.y - 0.3);
         gl.glEnd();
     }
 
@@ -55,8 +55,8 @@ public class Cube {
         gl.glBegin(gl.GL_QUADS);
         gl.glVertex2d(centralMid.x, centralMid.y);
         gl.glVertex2d(topLeft.x, topLeft.y);
-        gl.glVertex2d(topLeft.x, topLeft.y - 0.4);
-        gl.glVertex2d(centralMid.x, centralMid.y - 0.4);
+        gl.glVertex2d(topLeft.x, topLeft.y - 0.3);
+        gl.glVertex2d(centralMid.x, centralMid.y - 0.3);
         gl.glEnd();
     }
 
