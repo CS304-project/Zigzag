@@ -7,11 +7,17 @@ public class Ball {
     public Point2D.Double bottomLeft, bottomRight, topRight, topLeft;
     public Point2D.Double center;
 
-    public Ball(Point2D.Double bottomLeft, Point2D.Double bottomRight, Point2D.Double topRight, Point2D.Double topLeft) {
+    public Ball(
+            Point2D.Double bottomLeft,
+            Point2D.Double bottomRight,
+            Point2D.Double topRight,
+            Point2D.Double topLeft
+    ) {
         this.bottomLeft = bottomLeft;
         this.bottomRight = bottomRight;
         this.topRight = topRight;
         this.topLeft = topLeft;
+        this.center = new Point2D.Double((bottomRight.x + bottomLeft.x) / 2, (topLeft.y + bottomLeft.y) / 2);
     }
 
     public void drawBall(GL gl, int texture) {
