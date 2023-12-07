@@ -8,6 +8,9 @@ public class Cube {
     public Point2D.Double topLeft;
     public Point2D.Double topRight;
     public Point2D.Double centralMid;
+    public Point2D.Double botMid;
+    public Point2D.Double botLeft;
+    public Point2D.Double botRight;
     public Point2D.Double centerTileP;
     boolean hasADiamond;
     public Cube nextCube;
@@ -21,7 +24,9 @@ public class Cube {
         this.topLeft = topLeft;
         this.topRight = topRight;
         this.centralMid = centralMid;
-
+        this.botMid = new Point2D.Double(centralMid.x, centralMid.y - 0.3);
+        this.botLeft = new Point2D.Double(topLeft.x, topLeft.y - 0.3);
+        this.botRight = new Point2D.Double(topRight.x, topRight.y - 0.3);
     }
 
     public void drawCube(GL gl) {
@@ -45,8 +50,8 @@ public class Cube {
         gl.glBegin(gl.GL_QUADS);
         gl.glVertex2d(centralMid.x, centralMid.y);
         gl.glVertex2d(topRight.x, topRight.y);
-        gl.glVertex2d(topRight.x, topRight.y - 0.4);
-        gl.glVertex2d(centralMid.x, centralMid.y - 0.4);
+        gl.glVertex2d(botRight.x, botRight.y);
+        gl.glVertex2d(botMid.x, botMid.y);
         gl.glEnd();
     }
 
@@ -55,8 +60,8 @@ public class Cube {
         gl.glBegin(gl.GL_QUADS);
         gl.glVertex2d(centralMid.x, centralMid.y);
         gl.glVertex2d(topLeft.x, topLeft.y);
-        gl.glVertex2d(topLeft.x, topLeft.y - 0.4);
-        gl.glVertex2d(centralMid.x, centralMid.y - 0.4);
+        gl.glVertex2d(botLeft.x, botLeft.y);
+        gl.glVertex2d(botMid.x, botMid.y);
         gl.glEnd();
     }
 
@@ -69,20 +74,44 @@ public class Cube {
         int randomNumber = (int) (Math.random() * 20);
         double horizontalD = Math.sqrt(Math.pow(topRight.x - topLeft.x, 2) + Math.pow(topRight.y - topLeft.y, 2));
         double verticalD = Math.sqrt(Math.pow(topMid.x - centralMid.x, 2) + Math.pow(topMid.y - centralMid.y, 2));
-        if (randomNumber < 10) {
+        if (topLeft.x - horizontalD <= -1) {
             nextCube = new Cube(
                     new Point2D.Double(topRight.x, topRight.y + verticalD),
-                    topMid,
+                    new Point2D.Double(topMid.x, topMid.y),
                     new Point2D.Double(topMid.x + horizontalD, topMid.y),
-                    topRight
+                    new Point2D.Double(topRight.x, topRight.y)
+            );
+        } else if (topRight.x + horizontalD >= 1){
+            nextCube = new Cube(
+                    new Point2D.Double(topLeft.x, topLeft.y + verticalD),
+                    new Point2D.Double(topMid.x - horizontalD, topMid.y),
+                    new Point2D.Double(topMid.x, topMid.y),
+                    new Point2D.Double(topLeft.x, topLeft.y)
+            );
+        }
+        else if (randomNumber < 10) {
+            nextCube = new Cube(
+                    new Point2D.Double(topRight.x, topRight.y + verticalD),
+                    new Point2D.Double(topMid.x, topMid.y),
+                    new Point2D.Double(topMid.x + horizontalD, topMid.y),
+                    new Point2D.Double(topRight.x, topRight.y)
             );
         } else {
             nextCube = new Cube(
                     new Point2D.Double(topLeft.x, topLeft.y + verticalD),
                     new Point2D.Double(topMid.x - horizontalD, topMid.y),
-                    topMid,
-                    topLeft
+                    new Point2D.Double(topMid.x, topMid.y),
+                    new Point2D.Double(topLeft.x, topLeft.y)
             );
         }
+    }
+    public void animateCube(){
+        topMid.y -= 0.001;
+        topLeft.y -= 0.001;
+        centralMid.y -= 0.001;
+        topRight.y -= 0.001;
+        botMid.y -= 0.001;
+        botLeft.y -= 0.001;
+        botRight.y -= 0.001;
     }
 }
