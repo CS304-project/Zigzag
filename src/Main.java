@@ -1,9 +1,7 @@
 import javax.media.opengl.GLCanvas;
 import javax.swing.JFrame;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
-public class Main extends JFrame implements KeyListener {
+public class Main extends JFrame  {
     private final GLCanvas glCanvas;
     private final ZigzagGLEventListener listener;
 
@@ -13,11 +11,12 @@ public class Main extends JFrame implements KeyListener {
         glCanvas = new GLCanvas();
         listener = new ZigzagGLEventListener();
         listener.setGLCanvas(glCanvas);
+        glCanvas.addGLEventListener(listener);
 
         add(glCanvas);
         setLocationRelativeTo(this);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(500, 889);
+        setSize(1000, 800);
         setVisible(true);
     }
 
@@ -25,18 +24,5 @@ public class Main extends JFrame implements KeyListener {
         new Main();
     }
 
-    @Override
-    public void keyTyped(KeyEvent e) {
 
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-
-    }
 }
