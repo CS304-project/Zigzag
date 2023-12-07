@@ -90,4 +90,13 @@ public class Cube {
             );
         }
     }
+    public void animateCube(){
+        topMid.y -= 0.001;
+        topLeft.y -= 0.001;
+        centralMid.y -= 0.001;
+        topRight.y -= 0.001;
+        botMid.y -= 0.001;
+        botLeft.y -= 0.001;
+        botRight.y -= 0.001;
+    }
 }
