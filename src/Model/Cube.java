@@ -13,7 +13,7 @@ public class Cube {
     public Point2D.Double bottomRight;
     public Point2D.Double centerTileP;
     boolean hasADiamond;
-    Cube nextCube;
+    public Cube nextCube;
 
     public Cube(Point2D.Double topMid,
                 Point2D.Double topLeft,
@@ -64,7 +64,7 @@ public class Cube {
         // TODO
     }
 
-    public void generateNewCube(GL gl) {
+    public void generateNewCube() {
         int randomNumber = (int) (Math.random() * 20);
         double horizontalD = Math.sqrt(Math.pow(topRight.x - topLeft.x, 2) + Math.pow(topRight.y - topLeft.y, 2));
         double verticalD = Math.sqrt(Math.pow(topMid.x - centralMid.x, 2) + Math.pow(topMid.y - centralMid.y, 2));
@@ -89,6 +89,5 @@ public class Cube {
                     new Point2D.Double(topMid.x, topMid.y - 0.4)
             );
         }
-        nextCube.drawCube(gl);
     }
 }
