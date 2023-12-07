@@ -52,20 +52,15 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
                 new Point2D.Double(0, 0.3),
                 new Point2D.Double(-0.3, 0),
                 new Point2D.Double(0.3, 0),
-                new Point2D.Double(0, -0.3),
-                new Point2D.Double(0, -0.7),
-                new Point2D.Double(-0.3, -0.4),
-                new Point2D.Double(0.3, -0.4)
+                new Point2D.Double(0, -0.3)
+
         ));
 
         cubes.add(new Cube(
                 new Point2D.Double(0.1, 0.4),
                 new Point2D.Double(0, 0.3),
                 new Point2D.Double(0.2, 0.3),
-                new Point2D.Double(0.1, 0.2),
-                new Point2D.Double(0.1, 0),
-                new Point2D.Double(0, -0.1),
-                new Point2D.Double(0.2, -0.1)
+                new Point2D.Double(0.1, 0.2)
         ));
 
         for (int i = 0; i < 8; i++) {
