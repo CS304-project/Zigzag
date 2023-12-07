@@ -74,7 +74,22 @@ public class Cube {
         int randomNumber = (int) (Math.random() * 20);
         double horizontalD = Math.sqrt(Math.pow(topRight.x - topLeft.x, 2) + Math.pow(topRight.y - topLeft.y, 2));
         double verticalD = Math.sqrt(Math.pow(topMid.x - centralMid.x, 2) + Math.pow(topMid.y - centralMid.y, 2));
-        if (randomNumber < 10) {
+        if (topLeft.x - horizontalD <= -1) {
+            nextCube = new Cube(
+                    new Point2D.Double(topRight.x, topRight.y + verticalD),
+                    new Point2D.Double(topMid.x, topMid.y),
+                    new Point2D.Double(topMid.x + horizontalD, topMid.y),
+                    new Point2D.Double(topRight.x, topRight.y)
+            );
+        } else if (topRight.x + horizontalD >= 1){
+            nextCube = new Cube(
+                    new Point2D.Double(topLeft.x, topLeft.y + verticalD),
+                    new Point2D.Double(topMid.x - horizontalD, topMid.y),
+                    new Point2D.Double(topMid.x, topMid.y),
+                    new Point2D.Double(topLeft.x, topLeft.y)
+            );
+        }
+        else if (randomNumber < 10) {
             nextCube = new Cube(
                     new Point2D.Double(topRight.x, topRight.y + verticalD),
                     new Point2D.Double(topMid.x, topMid.y),
