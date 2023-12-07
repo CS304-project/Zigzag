@@ -1,3 +1,4 @@
+import Model.Ball;
 import Model.Cube;
 import Texture.TextureReader;
 
@@ -76,7 +77,15 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener , Mou
                 new Point2D.Double(0.1, -0.4)
         );
         cube.drawCube(gl);
-        System.out.println("drawed");
+
+        Ball ball = new Ball(
+                new Point2D.Double(-0.1, -0.1),
+                new Point2D.Double(0.1, -0.1),
+                new Point2D.Double(0.1, 0.1),
+                new Point2D.Double(-0.1, 0.1)
+        );
+
+        ball.drawBall(gl, textures[0]);
     }
 
     @Override
