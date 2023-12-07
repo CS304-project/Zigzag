@@ -1,3 +1,5 @@
+import com.sun.opengl.util.FPSAnimator;
+
 import javax.media.opengl.GLCanvas;
 import javax.swing.JFrame;
 
@@ -19,6 +21,7 @@ public class Main extends JFrame  {
         setSize(1280, 800);
         setLocationRelativeTo(this);
         setVisible(true);
+
     }
 
     public static void main(String[] args) {
