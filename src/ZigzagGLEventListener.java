@@ -20,7 +20,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     GLCanvas glCanvas;
     ArrayList<Cube> cubes = new ArrayList<>();
     private final Ball ball;
-    private  FPSAnimator animator;
+    private FPSAnimator animator;
     private final String[] textureNames = {
             "Ball//ball.png", "Diamond//WithShadow//Diamond.png", "HowToPlay//Info.png", "Play//Play_button.png",
             "Sound//sound_On.png"
@@ -66,6 +66,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
             idx++;
 
             cube.generateNewCube();
+
             cubes.add(cube.nextCube);
         }
     }
@@ -114,10 +115,10 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         for (int i = cubes.size() - 1; i >= 0; i--) {
             Cube cube = cubes.get(i);
 
-            cube.drawCube(gl);
+            cube.drawCube(gl, textures[1]);
             cube.animateCube();
         }
-        if (lastCube.centralMid.y - 0.3 <= 1){
+        if (lastCube.centralMid.y - 0.3 <= 1) {
             lastCube.generateNewCube();
             cubes.add(lastCube.nextCube);
         }
