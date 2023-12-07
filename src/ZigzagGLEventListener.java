@@ -1,6 +1,7 @@
 import Model.Ball;
 import Model.Cube;
 import Texture.TextureReader;
+import com.sun.opengl.util.FPSAnimator;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
@@ -15,9 +16,11 @@ import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class ZigzagGLEventListener implements GLEventListener, KeyListener , MouseListener {
+public class ZigzagGLEventListener implements GLEventListener, KeyListener, MouseListener {
     GLCanvas glCanvas;
-    ArrayList <Cube> cubes = new ArrayList<>();
+    ArrayList<Cube> cubes = new ArrayList<>();
+    private final FPSAnimator animator;
+    private final Ball ball;
 
     private final String[] textureNames = {
             "Ball//ball.png", "Diamond//WithShadow//Diamond.png", "HowToPlay//Info.png", "Play//Play_button.png",
@@ -27,11 +30,51 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener , Mou
     private final int[] textures = new int[textureNames.length];
 
     public void setGLCanvas(GLCanvas glc) {
-
         this.glCanvas = glc;
     }
-    public ZigzagGLEventListener(){
-    //todo
+
+    public ZigzagGLEventListener() {
+        animator = new FPSAnimator(glCanvas, 24);
+        ball = new Ball(
+                new Point2D.Double(-0.1, -0.1),
+                new Point2D.Double(0.1, -0.1),
+                new Point2D.Double(0.1, 0.1),
+                new Point2D.Double(-0.1, 0.1)
+        );
+
+        initCubes();
+    }
+
+    private void initCubes() {
+        int idx = 1;
+
+        cubes.add(new Cube(
+                new Point2D.Double(0, 0.3),
+                new Point2D.Double(-0.3, 0),
+                new Point2D.Double(0.3, 0),
+                new Point2D.Double(0, -0.3),
+                new Point2D.Double(0, -0.7),
+                new Point2D.Double(-0.3, -0.4),
+                new Point2D.Double(0.3, -0.4)
+        ));
+
+        cubes.add(new Cube(
+                new Point2D.Double(0.1, 0.4),
+                new Point2D.Double(0, 0.3),
+                new Point2D.Double(0.2, 0.3),
+                new Point2D.Double(0.1, 0.2),
+                new Point2D.Double(0.1, 0),
+                new Point2D.Double(0, -0.1),
+                new Point2D.Double(0.2, -0.1)
+        ));
+
+        for (int i = 0; i < 8; i++) {
+            Cube cube = cubes.get(idx);
+            idx++;
+
+            cube.generateNewCube();
+            cubes.add(cube.nextCube);
+        }
     }
 
     @Override
@@ -75,16 +118,11 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener , Mou
 
         //TODO: Start rendering
 
-        for (int i = cubes.size()-1; i >= 0; i--){
-            cubes.get(i).drawCube(gl);
-        }
+        for (int i = cubes.size() - 1; i >= 0; i--) {
+            Cube cube = cubes.get(i);
 
-        Ball ball = new Ball(
-                new Point2D.Double(-0.1, -0.1),
-                new Point2D.Double(0.1, -0.1),
-                new Point2D.Double(0.1, 0.1),
-                new Point2D.Double(-0.1, 0.1)
-        );
+            cube.drawCube(gl);
+        }
 
         ball.drawBall(gl, textures[0]);
     }
