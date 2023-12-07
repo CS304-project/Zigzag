@@ -64,19 +64,19 @@ public class Cube {
         // TODO
     }
 
-    public void generateNewCube() {
+    public void generateNewCube(GL gl) {
         int randomNumber = (int) (Math.random() * 20);
-        int horizontalD = (int) Math.sqrt(Math.pow(topRight.x - topLeft.x, 2) + Math.pow(topRight.y - topLeft.y, 2));
-        int verticalD = (int) Math.sqrt(Math.pow(topMid.x - centralMid.x, 2) + Math.pow(topMid.y - centralMid.y, 2));
+        double horizontalD = Math.sqrt(Math.pow(topRight.x - topLeft.x, 2) + Math.pow(topRight.y - topLeft.y, 2));
+        double verticalD = Math.sqrt(Math.pow(topMid.x - centralMid.x, 2) + Math.pow(topMid.y - centralMid.y, 2));
         if (randomNumber < 10) {
             nextCube = new Cube(
                     new Point2D.Double(topRight.x, topRight.y + verticalD),
                     topMid,
                     new Point2D.Double(topMid.x + horizontalD, topMid.y),
                     topRight,
-                    new Point2D.Double(topRight.x, topRight.y - 4),
-                    new Point2D.Double(topLeft.x, topLeft.y - 4),
-                    new Point2D.Double(topRight.x + horizontalD, topRight.y - 4)
+                    new Point2D.Double(topRight.x, topRight.y - 0.4),
+                    new Point2D.Double(topMid.x, topMid.y - 0.4),
+                    new Point2D.Double(topMid.x + horizontalD, topMid.y - 0.4)
             );
         } else {
             nextCube = new Cube(
@@ -84,10 +84,11 @@ public class Cube {
                     new Point2D.Double(topMid.x - horizontalD, topMid.y),
                     topMid,
                     topLeft,
-                    new Point2D.Double(topLeft.x, topLeft.y - 4),
-                    new Point2D.Double(topMid.x - horizontalD, topMid.y - 4),
-                    new Point2D.Double(topMid.x, topMid.y - 4)
+                    new Point2D.Double(topLeft.x, topLeft.y - 0.4),
+                    new Point2D.Double(topMid.x - horizontalD, topMid.y - 0.4),
+                    new Point2D.Double(topMid.x, topMid.y - 0.4)
             );
         }
+        nextCube.drawCube(gl);
     }
 }
