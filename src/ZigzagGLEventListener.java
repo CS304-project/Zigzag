@@ -13,9 +13,12 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Point2D;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class ZigzagGLEventListener implements GLEventListener, KeyListener , MouseListener {
     GLCanvas glCanvas;
+    ArrayList <Cube> cubes = new ArrayList<>();
+
     private final String[] textureNames = {
             "Ball//ball.png", "Diamond//WithShadow//Diamond.png", "HowToPlay//Info.png", "Play//Play_button.png",
             "Sound//sound_On.png"
@@ -27,6 +30,9 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener , Mou
 
         this.glCanvas = glc;
     }
+    public ZigzagGLEventListener(){
+    //todo
+    }
 
     @Override
     public void init(GLAutoDrawable glAutoDrawable) {
@@ -36,6 +42,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener , Mou
         gl.glEnable(GL.GL_TEXTURE_2D);
         gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
         gl.glGenTextures(textureNames.length, textures, 0);
+
 
         for (int i = 0; i < textureNames.length; i++) {
             try {
@@ -67,16 +74,10 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener , Mou
         gl.glLoadIdentity();
 
         //TODO: Start rendering
-        Cube cube = new Cube(
-                new Point2D.Double(0, 0.1),
-                new Point2D.Double(-0.1, 0),
-                new Point2D.Double(0.1, 0),
-                new Point2D.Double(0, -0.1),
-                new Point2D.Double(0, -0.5),
-                new Point2D.Double(-0.1, -0.4),
-                new Point2D.Double(0.1, -0.4)
-        );
-        cube.drawCube(gl);
+
+        for (int i = cubes.size()-1; i >= 0; i--){
+            cubes.get(i).drawCube(gl);
+        }
 
         Ball ball = new Ball(
                 new Point2D.Double(-0.1, -0.1),
