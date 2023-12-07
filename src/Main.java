@@ -16,7 +16,8 @@ public class Main extends JFrame  {
         add(glCanvas);
         setLocationRelativeTo(this);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(1000, 800);
+        setSize(1280, 800);
+        setLocationRelativeTo(this);
         setVisible(true);
     }
 
