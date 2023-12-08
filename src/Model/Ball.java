@@ -6,6 +6,7 @@ import java.awt.geom.Point2D;
 public class Ball {
     public Point2D.Double bottomLeft, bottomRight, topRight, topLeft;
     public Point2D.Double center;
+    public boolean directFlag = false;
 
     public Ball(
             Point2D.Double bottomLeft,
@@ -35,5 +36,19 @@ public class Ball {
         gl.glVertex2d(topLeft.x, topLeft.y);
         gl.glEnd();
         gl.glDisable(GL.GL_BLEND);
+    }
+
+    public void navigateBall(){
+        if(!directFlag){
+            bottomLeft.x += 0.001;
+            bottomRight.x += 0.001;
+            topLeft.x += 0.001;
+            topRight.x += 0.001;
+        }else {
+            bottomLeft.x -= 0.001;
+            bottomRight.x -= 0.001;
+            topLeft.x -= 0.001;
+            topRight.x -= 0.001;
+        }
     }
 }
