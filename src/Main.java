@@ -14,11 +14,12 @@ public class Main extends JFrame  {
         listener = new ZigzagGLEventListener();
         listener.setGLCanvas(glCanvas);
         glCanvas.addGLEventListener(listener);
-
+        glCanvas.addMouseListener(listener);
         add(glCanvas);
         setLocationRelativeTo(this);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(1280, 800);
+
         setLocationRelativeTo(this);
         setVisible(true);
 
