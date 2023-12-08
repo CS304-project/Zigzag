@@ -4,19 +4,19 @@ import javax.media.opengl.GL;
 import java.awt.geom.Point2D;
 
 public class Diamond {
-    public Point2D.Double bottomLeft, bottomRight, topRight, topLeft , center;
+    public Point2D.Float bottomLeft, bottomRight, topRight, topLeft , center;
 
     public Diamond(
-            Point2D.Double bottomLeft,
-            Point2D.Double bottomRight,
-            Point2D.Double topRight,
-            Point2D.Double topLeft
+            Point2D.Float bottomLeft,
+            Point2D.Float bottomRight,
+            Point2D.Float topRight,
+            Point2D.Float topLeft
     ) {
         this.bottomLeft = bottomLeft;
         this.bottomRight = bottomRight;
         this.topRight = topRight;
         this.topLeft = topLeft;
-        this.center = new Point2D.Double((bottomRight.x + bottomLeft.x) / 2, (topLeft.y + bottomLeft.y) / 2);
+        this.center = new Point2D.Float((bottomRight.x + bottomLeft.x) / 2, (topLeft.y + bottomLeft.y) / 2);
     }
 
     public void drawDiamond(GL gl, int texture) {
@@ -37,9 +37,9 @@ public class Diamond {
     }
 
     public void animateDiamond() {
-        bottomLeft.y -= 0.001;
-        topLeft.y -= 0.001;
-        bottomRight.y -= 0.001;
-        topRight.y -= 0.001;
+        bottomLeft.y -= 0.001f;
+        topLeft.y -= 0.001f;
+        bottomRight.y -= 0.001f;
+        topRight.y -= 0.001f;
     }
 }
