@@ -14,6 +14,9 @@ public class Cube {
     public Point2D.Double centerTileP;
     public Cube nextCube;
     public Diamond diamond;
+    public  String relativePos;
+    public static final String RIGHT = "right";
+    public static final String LEFT = "left";
 
     public Cube(Point2D.Double topMid,
                 Point2D.Double topLeft,
@@ -27,8 +30,31 @@ public class Cube {
         this.botMid = new Point2D.Double(centralMid.x, centralMid.y - 0.3);
         this.botLeft = new Point2D.Double(topLeft.x, topLeft.y - 0.3);
         this.botRight = new Point2D.Double(topRight.x, topRight.y - 0.3);
+        this.centerTileP = new Point2D.Double((topLeft.x + topRight.x) / 2, (topLeft.y + topRight.y) / 2);
+        this.relativePos = null;
+
         generateDiamond();
     }
+
+    public Cube(Point2D.Double topMid,
+                Point2D.Double topLeft,
+                Point2D.Double topRight,
+                Point2D.Double centralMid,
+                String relativePos) {
+
+        this.topMid = topMid;
+        this.topLeft = topLeft;
+        this.topRight = topRight;
+        this.centralMid = centralMid;
+        this.botMid = new Point2D.Double(centralMid.x, centralMid.y - 0.3);
+        this.botLeft = new Point2D.Double(topLeft.x, topLeft.y - 0.3);
+        this.botRight = new Point2D.Double(topRight.x, topRight.y - 0.3);
+        this.centerTileP = new Point2D.Double((topLeft.x + topRight.x) / 2, (topLeft.y + topRight.y) / 2);
+        this.relativePos = relativePos;
+
+        generateDiamond();
+    }
+
     public void drawCube(GL gl, int texture) {
         drawTile(gl);
         drawRProjection(gl);
@@ -87,36 +113,40 @@ public class Cube {
         int randomNumber = (int) (Math.random() * 20);
         double horizontalD = Math.sqrt(Math.pow(topRight.x - topLeft.x, 2) + Math.pow(topRight.y - topLeft.y, 2));
         double verticalD = Math.sqrt(Math.pow(topMid.x - centralMid.x, 2) + Math.pow(topMid.y - centralMid.y, 2));
+
         if (topLeft.x - horizontalD <= -1) {
             nextCube = new Cube(
                     new Point2D.Double(topRight.x, topRight.y + verticalD),
                     new Point2D.Double(topMid.x, topMid.y),
                     new Point2D.Double(topMid.x + horizontalD, topMid.y),
-                    new Point2D.Double(topRight.x, topRight.y)
+                    new Point2D.Double(topRight.x, topRight.y),
+                    RIGHT
             );
         } else if (topRight.x + horizontalD >= 1) {
             nextCube = new Cube(
                     new Point2D.Double(topLeft.x, topLeft.y + verticalD),
                     new Point2D.Double(topMid.x - horizontalD, topMid.y),
                     new Point2D.Double(topMid.x, topMid.y),
-                    new Point2D.Double(topLeft.x, topLeft.y)
+                    new Point2D.Double(topLeft.x, topLeft.y),
+                    LEFT
             );
         } else if (randomNumber < 10) {
             nextCube = new Cube(
                     new Point2D.Double(topRight.x, topRight.y + verticalD),
                     new Point2D.Double(topMid.x, topMid.y),
                     new Point2D.Double(topMid.x + horizontalD, topMid.y),
-                    new Point2D.Double(topRight.x, topRight.y)
+                    new Point2D.Double(topRight.x, topRight.y),
+                    RIGHT
             );
         } else {
             nextCube = new Cube(
                     new Point2D.Double(topLeft.x, topLeft.y + verticalD),
                     new Point2D.Double(topMid.x - horizontalD, topMid.y),
                     new Point2D.Double(topMid.x, topMid.y),
-                    new Point2D.Double(topLeft.x, topLeft.y)
+                    new Point2D.Double(topLeft.x, topLeft.y),
+                    LEFT
             );
         }
-
     }
 
     public void animateCube() {
@@ -127,6 +157,26 @@ public class Cube {
         botMid.y -= 0.001;
         botLeft.y -= 0.001;
         botRight.y -= 0.001;
+        centerTileP.y -= 0.001;
     }
 
+    public double calculateX2intersection(Point2D.Double point, boolean isMovingRight) {
+        double x2;
+
+        if (point.y < centerTileP.y) {
+            if (isMovingRight) {
+                x2 = -centralMid.y + centralMid.x;
+            } else {
+                x2 = centralMid.y + centralMid.x;
+            }
+        } else {
+            if (isMovingRight) {
+                x2 = topRight.y + topRight.x;
+            } else {
+                x2 = -topLeft.y + topLeft.x;
+            }
+        }
+
+        return x2;
+    }
 }
