@@ -14,7 +14,7 @@ public class Cube {
     public Point2D.Double centerTileP;
     public Cube nextCube;
     public Diamond diamond;
-    public  String relativePos;
+    public String relativePos;
     public static final String RIGHT = "right";
     public static final String LEFT = "left";
 
@@ -160,23 +160,17 @@ public class Cube {
         centerTileP.y -= 0.001;
     }
 
-    public double calculateX2intersection(Point2D.Double point, boolean isMovingRight) {
-        double x2;
+    public boolean isInside(Point2D.Double point) {
+        double x1, x2;
 
         if (point.y < centerTileP.y) {
-            if (isMovingRight) {
-                x2 = -centralMid.y + centralMid.x;
-            } else {
-                x2 = centralMid.y + centralMid.x;
-            }
+            x1 = -centralMid.y + centralMid.x; // right point
+            x2 = centralMid.y + centralMid.x; // left point
         } else {
-            if (isMovingRight) {
-                x2 = topRight.y + topRight.x;
-            } else {
-                x2 = -topLeft.y + topLeft.x;
-            }
+            x1 = topRight.y + topRight.x; // right point
+            x2 = -topLeft.y + topLeft.x; // left point
         }
 
-        return x2;
+        return point.x > x2 && point.x < x1;
     }
 }
