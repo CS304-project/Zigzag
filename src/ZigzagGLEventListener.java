@@ -39,10 +39,10 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
 
     public ZigzagGLEventListener() {
         ball = new Ball(
-                new Point2D.Double(-0.1, -0.1),
-                new Point2D.Double(0.1, -0.1),
-                new Point2D.Double(0.1, 0.1),
-                new Point2D.Double(-0.1, 0.1)
+                new Point2D.Float(-0.1f, -0.1f),
+                new Point2D.Float(0.1f, -0.1f),
+                new Point2D.Float(0.1f, 0.1f),
+                new Point2D.Float(-0.1f, 0.1f)
         );
 
         initCubes();
@@ -51,17 +51,17 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     private void initCubes() {
         int idx = 1;
         Cube firstCube = new Cube(
-                new Point2D.Double(0, 0.3),
-                new Point2D.Double(-0.3, 0),
-                new Point2D.Double(0.3, 0),
-                new Point2D.Double(0, -0.3)
+                new Point2D.Float(0, 0.3f),
+                new Point2D.Float(-0.3f, 0),
+                new Point2D.Float(0.3f, 0),
+                new Point2D.Float(0, -0.3f)
         );
 
         firstCube.nextCube = new Cube(
-                new Point2D.Double(0.1, 0.4),
-                new Point2D.Double(0, 0.3),
-                new Point2D.Double(0.2, 0.3),
-                new Point2D.Double(0.1, 0.2),
+                new Point2D.Float(0.1f, 0.4f),
+                new Point2D.Float(0, 0.3f),
+                new Point2D.Float(0.2f, 0.3f),
+                new Point2D.Float(0.1f, 0.2f),
                 Cube.RIGHT
         );
 
@@ -112,33 +112,30 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     public void display(GLAutoDrawable glAutoDrawable) {
         GL gl = glAutoDrawable.getGL();
         Cube lastCube = cubes.get(cubes.size() - 1);
+        Cube intersectedCube = null;
+
         gl.glClear(GL.GL_COLOR_BUFFER_BIT);
         gl.glLoadIdentity();
 
         for (int i = cubes.size() - 1; i >= 0; i--) {
             Cube cube = cubes.get(i);
-            double roundBallCenterX = Math.round(ball.center.x * 100) / 100.0;
-//            double xIntersection = cube.calculateX2intersection(ball.center, ball.isMovingRight);
-//            double roundXIntersection = Math.round(xIntersection * 100) / 100.0;
-            double roundTopMidY = Math.round(cube.topMid.y * 100) / 100.0;
-            double roundCentralMidY = Math.round(cube.centralMid.y * 100) / 100.0;
-            double roundBallCenterY = Math.round(ball.center.y * 100) / 100.0;
 
             cube.drawCube(gl, textures[1]);
             cube.animateCube();
+        }
 
-
-//            if (cube.nextCube != null) {
-//                System.out.println(cube.nextCube.relativePos);
-//            }
-//            System.out.println("is inside: " + cube.isInside(ball.center));
-//            System.out.println("range: " + (roundBallCenterY >= roundCentralMidY && roundBallCenterY <= roundTopMidY));
-//            System.out.println("----------------");
-
-            if (cube.nextCube != null && !cube.isInside(ball.center) && !cube.nextCube.isInside(ball.center) &&
-                    roundBallCenterY >= roundCentralMidY && roundBallCenterY <= roundTopMidY) {
-                animator.stop();
+        for (Cube cube : cubes) {
+            if (cube.isInside(ball.center)) {
+                intersectedCube = cube;
+                break;
+            } else if (cube.nextCube != null && cube.isInside(ball.center)) {
+                intersectedCube = cube.nextCube;
+                break;
             }
+        }
+
+        if (intersectedCube == null) {
+            animator.stop();
         }
 
         if (lastCube.centralMid.y - 0.3 <= 1) {
