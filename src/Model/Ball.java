@@ -6,7 +6,7 @@ import java.awt.geom.Point2D;
 public class Ball {
     public Point2D.Double bottomLeft, bottomRight, topRight, topLeft;
     public Point2D.Double center;
-    public boolean directFlag = false;
+    public boolean isMovingRight = true;
 
     public Ball(
             Point2D.Double bottomLeft,
@@ -18,7 +18,7 @@ public class Ball {
         this.bottomRight = bottomRight;
         this.topRight = topRight;
         this.topLeft = topLeft;
-        this.center = new Point2D.Double((bottomRight.x + bottomLeft.x) / 2, (topLeft.y + bottomLeft.y) / 2);
+        this.center = new Point2D.Double((topLeft.x + bottomRight.x) / 2, (topLeft.y + bottomRight.y) / 2);
     }
 
     public void drawBall(GL gl, int texture) {
@@ -38,17 +38,19 @@ public class Ball {
         gl.glDisable(GL.GL_BLEND);
     }
 
-    public void navigateBall(){
-        if(!directFlag){
+    public void navigateBall() {
+        if (isMovingRight) {
             bottomLeft.x += 0.001;
             bottomRight.x += 0.001;
             topLeft.x += 0.001;
             topRight.x += 0.001;
-        }else {
+            center.x += 0.001;
+        } else {
             bottomLeft.x -= 0.001;
             bottomRight.x -= 0.001;
             topLeft.x -= 0.001;
             topRight.x -= 0.001;
+            center.x -= 0.001;
         }
     }
 }
