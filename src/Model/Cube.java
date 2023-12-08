@@ -169,8 +169,6 @@ public class Cube {
         } else {
             x1 = Math.round((topRight.y + topRight.x) * 100) / 100.0f; // right point
             x2 = Math.round((-topLeft.y + topLeft.x) * 100) / 100.0f; // left point
-            System.out.println(x1);
-            System.out.println(x2);
         }
 
         return Math.round(point.x * 100) / 100.0f >= x2 && Math.round(point.x * 100) / 100.0f <= x1;
