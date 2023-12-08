@@ -1,9 +1,7 @@
-import Model.Cube;
 import com.sun.opengl.util.FPSAnimator;
 
 import javax.media.opengl.GLCanvas;
 import javax.swing.JFrame;
-import java.awt.geom.Point2D;
 
 public class Main extends JFrame  {
     private final GLCanvas glCanvas;
@@ -16,7 +14,7 @@ public class Main extends JFrame  {
 
         glCanvas = new GLCanvas();
         listener = new ZigzagGLEventListener();
-        animator = new FPSAnimator(glCanvas, 60);
+        animator = new FPSAnimator(glCanvas, 265);
 
         listener.setGLCanvas(glCanvas);
         listener.setAnimator(animator);
@@ -33,13 +31,5 @@ public class Main extends JFrame  {
 
     public static void main(String[] args) {
         new Main();
-//        Cube firstCube = new Cube(
-//                new Point2D.Double(0, 0.3),
-//                new Point2D.Double(-0.3, 0),
-//                new Point2D.Double(0.3, 0),
-//                new Point2D.Double(0, -0.3)
-//        );
-//
-//        System.out.println(firstCube.isInside(new Point2D.Double(0.4, 0.0)));
     }
 }
