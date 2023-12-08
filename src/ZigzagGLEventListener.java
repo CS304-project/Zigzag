@@ -21,6 +21,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     ArrayList<Cube> cubes = new ArrayList<>();
     private final Ball ball;
     private FPSAnimator animator;
+
     private final String[] textureNames = {
             "Ball//ball.png", "Diamond//WithShadow//Diamond.png", "HowToPlay//Info.png", "Play//Play_button.png",
             "Sound//sound_On.png"
@@ -32,6 +33,10 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         this.glCanvas = glc;
     }
 
+    public void setAnimator(FPSAnimator animator) {
+        this.animator = animator;
+    }
+
     public ZigzagGLEventListener() {
         ball = new Ball(
                 new Point2D.Double(-0.1, -0.1),
@@ -39,8 +44,8 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
                 new Point2D.Double(0.1, 0.1),
                 new Point2D.Double(-0.1, 0.1)
         );
-        initCubes();
 
+        initCubes();
     }
 
     private void initCubes() {
@@ -75,8 +80,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     @Override
     public void init(GLAutoDrawable glAutoDrawable) {
         GL gl = glAutoDrawable.getGL();
-        animator = new FPSAnimator(glCanvas, 265);
-        animator.start();
+
         gl.glClearColor(1, 1, 1, 1);
         gl.glEnable(GL.GL_TEXTURE_2D);
         gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
@@ -114,24 +118,27 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         for (int i = cubes.size() - 1; i >= 0; i--) {
             Cube cube = cubes.get(i);
             double roundBallCenterX = Math.round(ball.center.x * 100) / 100.0;
-            double xIntersection = cube.calculateX2intersection(ball.center, ball.isMovingRight);
-            double roundXIntersection = Math.round(xIntersection * 100) / 100.0;
+//            double xIntersection = cube.calculateX2intersection(ball.center, ball.isMovingRight);
+//            double roundXIntersection = Math.round(xIntersection * 100) / 100.0;
+            double roundTopMidY = Math.round(cube.topMid.y * 100) / 100.0;
+            double roundCentralMidY = Math.round(cube.centralMid.y * 100) / 100.0;
+            double roundBallCenterY = Math.round(ball.center.y * 100) / 100.0;
 
             cube.drawCube(gl, textures[1]);
             cube.animateCube();
 
+
 //            if (cube.nextCube != null) {
 //                System.out.println(cube.nextCube.relativePos);
 //            }
+//            System.out.println("is inside: " + cube.isInside(ball.center));
+//            System.out.println("range: " + (roundBallCenterY >= roundCentralMidY && roundBallCenterY <= roundTopMidY));
+//            System.out.println("----------------");
 
-//            if (cube.nextCube != null) {
-//                if (roundBallCenterX == roundXIntersection &&
-//                        ((Objects.equals(cube.nextCube.relativePos, Cube.RIGHT) && !ball.isMovingRight)
-//                                || (Objects.equals(cube.nextCube.relativePos, Cube.LEFT) && ball.isMovingRight))
-//                        && animator.isAnimating()) {
-//                    animator.stop();
-//                }
-//            }
+            if (cube.nextCube != null && !cube.isInside(ball.center) && !cube.nextCube.isInside(ball.center) &&
+                    roundBallCenterY >= roundCentralMidY && roundBallCenterY <= roundTopMidY) {
+                animator.stop();
+            }
         }
 
         if (lastCube.centralMid.y - 0.3 <= 1) {
