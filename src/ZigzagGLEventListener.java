@@ -8,6 +8,7 @@ import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
+import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -21,7 +22,8 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     ArrayList<Cube> cubes = new ArrayList<>();
     private final Ball ball;
     private FPSAnimator animator;
-
+    public JLabel counterLabel;
+    Integer score = -1;
     private final String[] textureNames = {
             "Ball//ball.png", "Diamond//WithShadow//Diamond.png", "HowToPlay//Info.png", "Play//Play_button.png",
             "Sound//sound_On.png"
@@ -46,6 +48,10 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         );
 
         initCubes();
+    }
+
+    public void setCounterLabel(JLabel counterLabel){
+        this.counterLabel = counterLabel;
     }
 
     private void initCubes() {
@@ -128,14 +134,19 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
             if (cube.isInside(ball.center)) {
                 intersectedCube = cube;
                 break;
-            } else if (cube.nextCube != null && cube.isInside(ball.center)) {
+            } else if (cube.nextCube != null && cube.nextCube.isInside(ball.center)) {
                 intersectedCube = cube.nextCube;
                 break;
             }
         }
 
+
         if (intersectedCube == null) {
             animator.stop();
+        } else if (!intersectedCube.hasBeenPassed){
+            score++;
+            counterLabel.setText(score.toString());
+            intersectedCube.hasBeenPassed = true;
         }
 
         if (lastCube.centralMid.y - 0.3 <= 1) {
