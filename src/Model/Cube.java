@@ -17,7 +17,7 @@ public class Cube {
     public String relativePos;
     public static final String RIGHT = "right";
     public static final String LEFT = "left";
-
+    public boolean hasBeenPassed = false;
     public Cube(Point2D.Float topMid,
                 Point2D.Float topLeft,
                 Point2D.Float topRight,
