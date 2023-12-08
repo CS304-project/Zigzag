@@ -125,6 +125,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
 
 
         ball.drawBall(gl, textures[0]);
+        ball.navigateBall();
     }
 
     @Override
@@ -154,7 +155,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
 
     @Override
     public void mouseClicked(MouseEvent e) {
-
+        ball.directFlag = !ball.directFlag;
     }
 
     @Override
