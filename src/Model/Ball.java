@@ -4,21 +4,20 @@ import javax.media.opengl.GL;
 import java.awt.geom.Point2D;
 
 public class Ball {
-    public Point2D.Double bottomLeft, bottomRight, topRight, topLeft;
-    public Point2D.Double center;
+    public Point2D.Float bottomLeft, bottomRight, topRight, topLeft, center;
     public boolean isMovingRight = true;
 
     public Ball(
-            Point2D.Double bottomLeft,
-            Point2D.Double bottomRight,
-            Point2D.Double topRight,
-            Point2D.Double topLeft
+            Point2D.Float bottomLeft,
+            Point2D.Float bottomRight,
+            Point2D.Float topRight,
+            Point2D.Float topLeft
     ) {
         this.bottomLeft = bottomLeft;
         this.bottomRight = bottomRight;
         this.topRight = topRight;
         this.topLeft = topLeft;
-        this.center = new Point2D.Double((topLeft.x + bottomRight.x) / 2, (topLeft.y + bottomRight.y) / 2);
+        this.center = new Point2D.Float((topLeft.x + bottomRight.x) / 2, (topLeft.y + bottomRight.y) / 2);
     }
 
     public void drawBall(GL gl, int texture) {
@@ -40,17 +39,17 @@ public class Ball {
 
     public void navigateBall() {
         if (isMovingRight) {
-            bottomLeft.x += 0.001;
-            bottomRight.x += 0.001;
-            topLeft.x += 0.001;
-            topRight.x += 0.001;
-            center.x += 0.001;
+            bottomLeft.x += 0.001f;
+            bottomRight.x += 0.001f;
+            topLeft.x += 0.001f;
+            topRight.x += 0.001f;
+            center.x += 0.001f;
         } else {
-            bottomLeft.x -= 0.001;
-            bottomRight.x -= 0.001;
-            topLeft.x -= 0.001;
-            topRight.x -= 0.001;
-            center.x -= 0.001;
+            bottomLeft.x -= 0.001f;
+            bottomRight.x -= 0.001f;
+            topLeft.x -= 0.001f;
+            topRight.x -= 0.001f;
+            center.x -= 0.001f;
         }
     }
 }
