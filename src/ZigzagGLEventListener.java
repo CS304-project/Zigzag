@@ -45,28 +45,29 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
 
     private void initCubes() {
         int idx = 1;
-
-        cubes.add(new Cube(
+        Cube firstCube = new Cube(
                 new Point2D.Double(0, 0.3),
                 new Point2D.Double(-0.3, 0),
                 new Point2D.Double(0.3, 0),
                 new Point2D.Double(0, -0.3)
+        );
 
-        ));
-
-        cubes.add(new Cube(
+        firstCube.nextCube = new Cube(
                 new Point2D.Double(0.1, 0.4),
                 new Point2D.Double(0, 0.3),
                 new Point2D.Double(0.2, 0.3),
-                new Point2D.Double(0.1, 0.2)
-        ));
+                new Point2D.Double(0.1, 0.2),
+                Cube.RIGHT
+        );
+
+        cubes.add(firstCube);
+        cubes.add(firstCube.nextCube);
 
         for (int i = 0; i < 8; i++) {
             Cube cube = cubes.get(idx);
             idx++;
 
             cube.generateNewCube();
-
             cubes.add(cube.nextCube);
         }
     }
@@ -80,7 +81,6 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         gl.glEnable(GL.GL_TEXTURE_2D);
         gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
         gl.glGenTextures(textureNames.length, textures, 0);
-
 
         for (int i = 0; i < textureNames.length; i++) {
             try {
@@ -111,18 +111,33 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         gl.glClear(GL.GL_COLOR_BUFFER_BIT);
         gl.glLoadIdentity();
 
-        //TODO: Start rendering
         for (int i = cubes.size() - 1; i >= 0; i--) {
             Cube cube = cubes.get(i);
+            double roundBallCenterX = Math.round(ball.center.x * 100) / 100.0;
+            double xIntersection = cube.calculateX2intersection(ball.center, ball.isMovingRight);
+            double roundXIntersection = Math.round(xIntersection * 100) / 100.0;
 
             cube.drawCube(gl, textures[1]);
             cube.animateCube();
+
+//            if (cube.nextCube != null) {
+//                System.out.println(cube.nextCube.relativePos);
+//            }
+
+//            if (cube.nextCube != null) {
+//                if (roundBallCenterX == roundXIntersection &&
+//                        ((Objects.equals(cube.nextCube.relativePos, Cube.RIGHT) && !ball.isMovingRight)
+//                                || (Objects.equals(cube.nextCube.relativePos, Cube.LEFT) && ball.isMovingRight))
+//                        && animator.isAnimating()) {
+//                    animator.stop();
+//                }
+//            }
         }
+
         if (lastCube.centralMid.y - 0.3 <= 1) {
             lastCube.generateNewCube();
             cubes.add(lastCube.nextCube);
         }
-
 
         ball.drawBall(gl, textures[0]);
         ball.navigateBall();
@@ -155,7 +170,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        ball.directFlag = !ball.directFlag;
+        ball.isMovingRight = !ball.isMovingRight;
     }
 
     @Override
