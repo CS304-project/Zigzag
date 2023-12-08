@@ -21,6 +21,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     ArrayList<Cube> cubes = new ArrayList<>();
     private final Ball ball;
     private FPSAnimator animator;
+
     private final String[] textureNames = {
             "Ball//ball.png", "Diamond//WithShadow//Diamond.png", "HowToPlay//Info.png", "Play//Play_button.png",
             "Sound//sound_On.png"
@@ -32,41 +33,46 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         this.glCanvas = glc;
     }
 
+    public void setAnimator(FPSAnimator animator) {
+        this.animator = animator;
+    }
+
     public ZigzagGLEventListener() {
         ball = new Ball(
-                new Point2D.Double(-0.1, -0.1),
-                new Point2D.Double(0.1, -0.1),
-                new Point2D.Double(0.1, 0.1),
-                new Point2D.Double(-0.1, 0.1)
+                new Point2D.Float(-0.1f, -0.1f),
+                new Point2D.Float(0.1f, -0.1f),
+                new Point2D.Float(0.1f, 0.1f),
+                new Point2D.Float(-0.1f, 0.1f)
         );
-        initCubes();
 
+        initCubes();
     }
 
     private void initCubes() {
         int idx = 1;
+        Cube firstCube = new Cube(
+                new Point2D.Float(0, 0.3f),
+                new Point2D.Float(-0.3f, 0),
+                new Point2D.Float(0.3f, 0),
+                new Point2D.Float(0, -0.3f)
+        );
 
-        cubes.add(new Cube(
-                new Point2D.Double(0, 0.3),
-                new Point2D.Double(-0.3, 0),
-                new Point2D.Double(0.3, 0),
-                new Point2D.Double(0, -0.3)
+        firstCube.nextCube = new Cube(
+                new Point2D.Float(0.1f, 0.4f),
+                new Point2D.Float(0, 0.3f),
+                new Point2D.Float(0.2f, 0.3f),
+                new Point2D.Float(0.1f, 0.2f),
+                Cube.RIGHT
+        );
 
-        ));
-
-        cubes.add(new Cube(
-                new Point2D.Double(0.1, 0.4),
-                new Point2D.Double(0, 0.3),
-                new Point2D.Double(0.2, 0.3),
-                new Point2D.Double(0.1, 0.2)
-        ));
+        cubes.add(firstCube);
+        cubes.add(firstCube.nextCube);
 
         for (int i = 0; i < 8; i++) {
             Cube cube = cubes.get(idx);
             idx++;
 
             cube.generateNewCube();
-
             cubes.add(cube.nextCube);
         }
     }
@@ -74,13 +80,11 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     @Override
     public void init(GLAutoDrawable glAutoDrawable) {
         GL gl = glAutoDrawable.getGL();
-        animator = new FPSAnimator(glCanvas, 265);
-        animator.start();
+
         gl.glClearColor(1, 1, 1, 1);
         gl.glEnable(GL.GL_TEXTURE_2D);
         gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
         gl.glGenTextures(textureNames.length, textures, 0);
-
 
         for (int i = 0; i < textureNames.length; i++) {
             try {
@@ -108,23 +112,39 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     public void display(GLAutoDrawable glAutoDrawable) {
         GL gl = glAutoDrawable.getGL();
         Cube lastCube = cubes.get(cubes.size() - 1);
+        Cube intersectedCube = null;
+
         gl.glClear(GL.GL_COLOR_BUFFER_BIT);
         gl.glLoadIdentity();
 
-        //TODO: Start rendering
         for (int i = cubes.size() - 1; i >= 0; i--) {
             Cube cube = cubes.get(i);
 
             cube.drawCube(gl, textures[1]);
             cube.animateCube();
         }
+
+        for (Cube cube : cubes) {
+            if (cube.isInside(ball.center)) {
+                intersectedCube = cube;
+                break;
+            } else if (cube.nextCube != null && cube.isInside(ball.center)) {
+                intersectedCube = cube.nextCube;
+                break;
+            }
+        }
+
+        if (intersectedCube == null) {
+            animator.stop();
+        }
+
         if (lastCube.centralMid.y - 0.3 <= 1) {
             lastCube.generateNewCube();
             cubes.add(lastCube.nextCube);
         }
 
-
         ball.drawBall(gl, textures[0]);
+        ball.navigateBall();
     }
 
     @Override
@@ -154,7 +174,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
 
     @Override
     public void mouseClicked(MouseEvent e) {
-
+        ball.isMovingRight = !ball.isMovingRight;
     }
 
     @Override

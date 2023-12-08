@@ -4,31 +4,57 @@ import javax.media.opengl.GL;
 import java.awt.geom.Point2D;
 
 public class Cube {
-    public Point2D.Double topMid;
-    public Point2D.Double topLeft;
-    public Point2D.Double topRight;
-    public Point2D.Double centralMid;
-    public Point2D.Double botMid;
-    public Point2D.Double botLeft;
-    public Point2D.Double botRight;
-    public Point2D.Double centerTileP;
+    public Point2D.Float topMid;
+    public Point2D.Float topLeft;
+    public Point2D.Float topRight;
+    public Point2D.Float centralMid;
+    public Point2D.Float botMid;
+    public Point2D.Float botLeft;
+    public Point2D.Float botRight;
+    public Point2D.Float centerTileP;
     public Cube nextCube;
     public Diamond diamond;
+    public String relativePos;
+    public static final String RIGHT = "right";
+    public static final String LEFT = "left";
 
-    public Cube(Point2D.Double topMid,
-                Point2D.Double topLeft,
-                Point2D.Double topRight,
-                Point2D.Double centralMid) {
+    public Cube(Point2D.Float topMid,
+                Point2D.Float topLeft,
+                Point2D.Float topRight,
+                Point2D.Float centralMid) {
 
         this.topMid = topMid;
         this.topLeft = topLeft;
         this.topRight = topRight;
         this.centralMid = centralMid;
-        this.botMid = new Point2D.Double(centralMid.x, centralMid.y - 0.3);
-        this.botLeft = new Point2D.Double(topLeft.x, topLeft.y - 0.3);
-        this.botRight = new Point2D.Double(topRight.x, topRight.y - 0.3);
+        this.botMid = new Point2D.Float(centralMid.x, centralMid.y - 0.3f);
+        this.botLeft = new Point2D.Float(topLeft.x, topLeft.y - 0.3f);
+        this.botRight = new Point2D.Float(topRight.x, topRight.y - 0.3f);
+        this.centerTileP = new Point2D.Float((topLeft.x + topRight.x) / 2, (topLeft.y + topRight.y) / 2);
+        this.relativePos = null;
+
         generateDiamond();
     }
+
+    public Cube(Point2D.Float topMid,
+                Point2D.Float topLeft,
+                Point2D.Float topRight,
+                Point2D.Float centralMid,
+                String relativePos) {
+
+        this.topMid = topMid;
+        this.topLeft = topLeft;
+        this.topRight = topRight;
+        this.centralMid = centralMid;
+        this.botMid = new Point2D.Float(centralMid.x, centralMid.y - 0.3f);
+        this.botLeft = new Point2D.Float(topLeft.x, topLeft.y - 0.3f);
+        this.botRight = new Point2D.Float(topRight.x, topRight.y - 0.3f);
+        this.centerTileP = new Point2D.Float((topLeft.x + topRight.x) / 2, (topLeft.y + topRight.y) / 2);
+        this.relativePos = relativePos;
+
+        generateDiamond();
+    }
+
     public void drawCube(GL gl, int texture) {
         drawTile(gl);
         drawRProjection(gl);
@@ -74,10 +100,10 @@ public class Cube {
         int randomNumber = (int) (Math.random() * 10);
         if (randomNumber > 6) {
             diamond = new Diamond(
-                    new Point2D.Double((topLeft.x + centralMid.x) / 2, (topLeft.y + centralMid.y) / 2),
-                    new Point2D.Double((centralMid.x + topRight.x) / 2, (centralMid.y + topRight.y) / 2),
-                    new Point2D.Double((topRight.x + topMid.x) / 2, (topRight.y + topMid.y) / 2),
-                    new Point2D.Double((topMid.x + topLeft.x) / 2, (topMid.y + topLeft.y) / 2)
+                    new Point2D.Float((topLeft.x + centralMid.x) / 2, (topLeft.y + centralMid.y) / 2),
+                    new Point2D.Float((centralMid.x + topRight.x) / 2, (centralMid.y + topRight.y) / 2),
+                    new Point2D.Float((topRight.x + topMid.x) / 2, (topRight.y + topMid.y) / 2),
+                    new Point2D.Float((topMid.x + topLeft.x) / 2, (topMid.y + topLeft.y) / 2)
             );
         }
 
@@ -85,48 +111,68 @@ public class Cube {
 
     public void generateNewCube() {
         int randomNumber = (int) (Math.random() * 20);
-        double horizontalD = Math.sqrt(Math.pow(topRight.x - topLeft.x, 2) + Math.pow(topRight.y - topLeft.y, 2));
-        double verticalD = Math.sqrt(Math.pow(topMid.x - centralMid.x, 2) + Math.pow(topMid.y - centralMid.y, 2));
+        float horizontalD = (float) Math.sqrt(Math.pow(topRight.x - topLeft.x, 2) + Math.pow(topRight.y - topLeft.y, 2));
+        float verticalD = (float) Math.sqrt(Math.pow(topMid.x - centralMid.x, 2) + Math.pow(topMid.y - centralMid.y, 2));
+
         if (topLeft.x - horizontalD <= -1) {
             nextCube = new Cube(
-                    new Point2D.Double(topRight.x, topRight.y + verticalD),
-                    new Point2D.Double(topMid.x, topMid.y),
-                    new Point2D.Double(topMid.x + horizontalD, topMid.y),
-                    new Point2D.Double(topRight.x, topRight.y)
+                    new Point2D.Float(topRight.x, topRight.y + verticalD),
+                    new Point2D.Float(topMid.x, topMid.y),
+                    new Point2D.Float(topMid.x + horizontalD, topMid.y),
+                    new Point2D.Float(topRight.x, topRight.y),
+                    RIGHT
             );
         } else if (topRight.x + horizontalD >= 1) {
             nextCube = new Cube(
-                    new Point2D.Double(topLeft.x, topLeft.y + verticalD),
-                    new Point2D.Double(topMid.x - horizontalD, topMid.y),
-                    new Point2D.Double(topMid.x, topMid.y),
-                    new Point2D.Double(topLeft.x, topLeft.y)
+                    new Point2D.Float(topLeft.x, topLeft.y + verticalD),
+                    new Point2D.Float(topMid.x - horizontalD, topMid.y),
+                    new Point2D.Float(topMid.x, topMid.y),
+                    new Point2D.Float(topLeft.x, topLeft.y),
+                    LEFT
             );
         } else if (randomNumber < 10) {
             nextCube = new Cube(
-                    new Point2D.Double(topRight.x, topRight.y + verticalD),
-                    new Point2D.Double(topMid.x, topMid.y),
-                    new Point2D.Double(topMid.x + horizontalD, topMid.y),
-                    new Point2D.Double(topRight.x, topRight.y)
+                    new Point2D.Float(topRight.x, topRight.y + verticalD),
+                    new Point2D.Float(topMid.x, topMid.y),
+                    new Point2D.Float(topMid.x + horizontalD, topMid.y),
+                    new Point2D.Float(topRight.x, topRight.y),
+                    RIGHT
             );
         } else {
             nextCube = new Cube(
-                    new Point2D.Double(topLeft.x, topLeft.y + verticalD),
-                    new Point2D.Double(topMid.x - horizontalD, topMid.y),
-                    new Point2D.Double(topMid.x, topMid.y),
-                    new Point2D.Double(topLeft.x, topLeft.y)
+                    new Point2D.Float(topLeft.x, topLeft.y + verticalD),
+                    new Point2D.Float(topMid.x - horizontalD, topMid.y),
+                    new Point2D.Float(topMid.x, topMid.y),
+                    new Point2D.Float(topLeft.x, topLeft.y),
+                    LEFT
             );
         }
-
     }
 
     public void animateCube() {
-        topMid.y -= 0.001;
-        topLeft.y -= 0.001;
-        centralMid.y -= 0.001;
-        topRight.y -= 0.001;
-        botMid.y -= 0.001;
-        botLeft.y -= 0.001;
-        botRight.y -= 0.001;
+        topMid.y -= 0.001f;
+        topLeft.y -= 0.001f;
+        centralMid.y -= 0.001f;
+        topRight.y -= 0.001f;
+        botMid.y -= 0.001f;
+        botLeft.y -= 0.001f;
+        botRight.y -= 0.001f;
+        centerTileP.y -= 0.001f;
     }
 
+    public boolean isInside(Point2D.Float point) {
+        float x1, x2;
+
+        if (point.y < centerTileP.y) {
+            x1 = Math.round((-centralMid.y + centralMid.x) * 100) / 100.0f; // right point
+            x2 = Math.round((centralMid.y + centralMid.x) * 100) / 100.0f; // left point
+        } else {
+            x1 = Math.round((topRight.y + topRight.x) * 100) / 100.0f; // right point
+            x2 = Math.round((-topLeft.y + topLeft.x) * 100) / 100.0f; // left point
+            System.out.println(x1);
+            System.out.println(x2);
+        }
+
+        return Math.round(point.x * 100) / 100.0f >= x2 && Math.round(point.x * 100) / 100.0f <= x1;
+    }
 }
