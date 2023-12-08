@@ -11,7 +11,6 @@ public class Main extends JFrame  {
     public final JLabel counterLabel;
     public final JLabel scoreLabel;
     private final JPanel jPanel;
-
     public Main() {
         super("Zigzag");
 
@@ -24,6 +23,7 @@ public class Main extends JFrame  {
         jPanel.add(scoreLabel);
         jPanel.add(counterLabel);
         jPanel.setOpaque(true);
+        jPanel.setBackground(Color.white);
         listener.setCounterLabel(counterLabel);
 
         listener.setGLCanvas(glCanvas);
