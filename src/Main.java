@@ -24,8 +24,9 @@ public class Main extends JFrame  {
         jPanel.add(counterLabel);
         jPanel.setOpaque(true);
         jPanel.setBackground(Color.white);
+        jPanel.setVisible(false);
         listener.setCounterLabel(counterLabel);
-
+        listener.setScorePanel(jPanel);
         listener.setGLCanvas(glCanvas);
         listener.setAnimator(animator);
         glCanvas.addGLEventListener(listener);
