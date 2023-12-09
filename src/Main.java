@@ -1,42 +1,46 @@
+import com.sun.opengl.util.FPSAnimator;
+
 import javax.media.opengl.GLCanvas;
 import javax.swing.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.*;
 
-public class Main extends JFrame implements KeyListener {
+public class Main extends JFrame  {
     private final GLCanvas glCanvas;
     private final ZigzagGLEventListener listener;
-
+    private FPSAnimator animator;
+    public final JLabel counterLabel;
+    public final JLabel scoreLabel;
+    private final JPanel jPanel;
     public Main() {
         super("Zigzag");
 
         glCanvas = new GLCanvas();
         listener = new ZigzagGLEventListener();
-        listener.setGLCanvas(glCanvas);
+        animator = new FPSAnimator(glCanvas, 265);
+        counterLabel = new JLabel("0");
+        scoreLabel = new JLabel("score: ");
+        jPanel = new JPanel();
+        jPanel.add(scoreLabel);
+        jPanel.add(counterLabel);
+        jPanel.setOpaque(true);
+        jPanel.setBackground(Color.white);
+        listener.setCounterLabel(counterLabel);
 
+        listener.setGLCanvas(glCanvas);
+        listener.setAnimator(animator);
+        glCanvas.addGLEventListener(listener);
+        glCanvas.addMouseListener(listener);
         add(glCanvas);
+        add(jPanel, BorderLayout.EAST);
         setLocationRelativeTo(this);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(500, 889);
+        setSize(1280, 800);
+        setLocationRelativeTo(this);
         setVisible(true);
+        animator.start();
     }
 
     public static void main(String[] args) {
         new Main();
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
-
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-
     }
 }
