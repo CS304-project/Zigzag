@@ -61,7 +61,6 @@ public class Cube {
         drawLProjection(gl);
         if (diamond != null) {
             diamond.drawDiamond(gl, texture);
-            diamond.animateDiamond();
         }
 
     }
