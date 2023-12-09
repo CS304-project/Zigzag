@@ -18,6 +18,7 @@ public class Cube {
     public static final String RIGHT = "right";
     public static final String LEFT = "left";
     public boolean hasBeenPassed = false;
+
     public Cube(Point2D.Float topMid,
                 Point2D.Float topLeft,
                 Point2D.Float topRight,
@@ -99,10 +100,10 @@ public class Cube {
         int randomNumber = (int) (Math.random() * 10);
         if (randomNumber > 6) {
             diamond = new Diamond(
-                    new Point2D.Float((topLeft.x + centralMid.x) / 2, (topLeft.y + centralMid.y) / 2),
-                    new Point2D.Float((centralMid.x + topRight.x) / 2, (centralMid.y + topRight.y) / 2),
-                    new Point2D.Float((topRight.x + topMid.x) / 2, (topRight.y + topMid.y) / 2),
-                    new Point2D.Float((topMid.x + topLeft.x) / 2, (topMid.y + topLeft.y) / 2)
+                    new Point2D.Float((topLeft.x + centralMid.x) / 2 + 0.03f, (topLeft.y + centralMid.y) / 2 + 0.01f),
+                    new Point2D.Float((centralMid.x + topRight.x) / 2 - 0.03f, (centralMid.y + topRight.y) / 2 + 0.01f),
+                    new Point2D.Float((topRight.x + topMid.x) / 2 - 0.03f, (topRight.y + topMid.y) / 2 - 0.01f),
+                    new Point2D.Float((topMid.x + topLeft.x) / 2 + 0.03f, (topMid.y + topLeft.y) / 2 - 0.01f)
             );
         }
 
@@ -157,6 +158,18 @@ public class Cube {
         botLeft.y -= 0.001f;
         botRight.y -= 0.001f;
         centerTileP.y -= 0.001f;
+    }
+
+    public void animateFallingCube(GL gl, int texture) {
+        drawCube(gl, texture);
+        topMid.y -= 0.003f;
+        topLeft.y -= 0.003f;
+        centralMid.y -= 0.003f;
+        topRight.y -= 0.003f;
+        botMid.y -= 0.003f;
+        botLeft.y -= 0.003f;
+        botRight.y -= 0.003f;
+        centerTileP.y -= 0.003f;
     }
 
     public boolean isInside(Point2D.Float point) {
