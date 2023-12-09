@@ -1,7 +1,7 @@
 import Config.GameState;
+import Config.GameMode;
 import Model.Ball;
 import Model.Cube;
-import Model.Diamond;
 import Texture.TextureReader;
 import com.sun.opengl.util.FPSAnimator;
 
@@ -22,18 +22,20 @@ import java.util.ArrayList;
 public class ZigzagGLEventListener implements GLEventListener, KeyListener, MouseListener {
     GLCanvas glCanvas;
     ArrayList<Cube> cubes = new ArrayList<>();
-    private final Ball ball;
+    private final Ball ball1;
+    private Ball ball2;
     private FPSAnimator animator;
-    public JLabel counterLabel;
-    public JPanel scorePanel;
-    Integer score = -1;
-    float distance;
+    public JLabel counterLabelP1;
+    private JLabel counterLabelP2;
+    Integer scoreP1 = -1;
+    Integer scoreP2 = -1;
     float y = 0;
     boolean isGoingUp = true;
     GameState gameState = GameState.WELCOME;
+    private GameMode mode;
     private final String[] textureNames = {
             "Ball//ball.png", "Diamond//WithShadow//Diamond.png", "Home//Info.png", "Home//Play_button.png",
-            "Home//sound_On.png","Home//TapToPlay.png", "Home//title.png", "EndGame//GameOver.png"
+            "Home//sound_On.png","Home//TapToPlay.png", "Home//title.png", "EndGame//GameOver.png",  "Ball//ball2.png"
     };
     private final TextureReader.Texture[] texture = new TextureReader.Texture[textureNames.length];
     private final int[] textures = new int[textureNames.length];
@@ -50,18 +52,32 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     }
 
     public ZigzagGLEventListener() {
-        ball = new Ball(
-                new Point2D.Float(-0.1f, -0.1f),
-                new Point2D.Float(0.1f, -0.1f),
-                new Point2D.Float(0.1f, 0.1f),
-                new Point2D.Float(-0.1f, 0.1f)
+        ball1 = new Ball(
+                new Point2D.Float(-0.025f, -0.025f),
+                new Point2D.Float(0.025f, -0.025f),
+                new Point2D.Float(0.025f, 0.025f),
+                new Point2D.Float(-0.025f, 0.025f)
         );
+        mode = GameMode.MULTIPLAYER;
+
+        if (mode == GameMode.MULTIPLAYER) {
+            ball2 = new Ball(
+                    new Point2D.Float(-0.05f, -0.025f),
+                    new Point2D.Float(0, -0.025f),
+                    new Point2D.Float(0, 0.025f),
+                    new Point2D.Float(-0.05f, 0.025f)
+            );
+        }
 
         initCubes();
     }
 
-    public void setCounterLabel(JLabel counterLabel) {
-        this.counterLabel = counterLabel;
+    public void setCounterLabelP1(JLabel counterLabel) {
+        this.counterLabelP1 = counterLabel;
+    }
+
+    public void setCounterLabelP2(JLabel counterLabel) {
+        this.counterLabelP2 = counterLabel;
     }
 
     private void initCubes() {
@@ -126,6 +142,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     @Override
     public void display(GLAutoDrawable glAutoDrawable) {
         GL gl = glAutoDrawable.getGL();
+        Cube lastCube = cubes.get(cubes.size() - 1);
 
         gl.glClear(GL.GL_COLOR_BUFFER_BIT);
         gl.glLoadIdentity();
@@ -164,38 +181,107 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
                 cube.diamond.animateDiamond();
         }
 
-        for (Cube cube : cubes) {
-            if (cube.isInside(ball.center)) {
-                intersectedCube = cube;
-                break;
-            } else if (cube.nextCube != null && cube.nextCube.isInside(ball.center)) {
-                intersectedCube = cube.nextCube;
-                break;
+        if (mode == GameMode.SINGLE_PLAYER) {
+            Cube intersectedCube = null;
+
+            for (Cube cube : cubes) {
+                if (cube.isInside(ball1.center)) {
+                    intersectedCube = cube;
+                    break;
+                } else if (cube.nextCube != null && cube.nextCube.isInside(ball1.center)) {
+                    intersectedCube = cube.nextCube;
+                    break;
+                }
+            }
+
+            if (intersectedCube == null && animator.isAnimating()) {
+                animator.stop();
+            } else if (intersectedCube != null && !intersectedCube.hasBeenPassed) {
+                scoreP1++;
+                counterLabelP1.setText(scoreP1.toString());
+                intersectedCube.hasBeenPassed = true;
+            }
+
+            if (intersectedCube != null && intersectedCube.diamond != null) {
+                float distance = (float) Math.sqrt(Math.pow((ball1.center.x - intersectedCube.diamond.center.x), 2) + Math.pow((ball1.center.y - intersectedCube.diamond.center.y), 2));
+                if (distance <= (ball1.radius + intersectedCube.diamond.radius)) {
+                    intersectedCube.diamond = null;
+                    scoreP1 += 2;
+                    counterLabelP1.setText(scoreP1.toString());
+                }
+            }
+        } else {
+            Cube intersectedCube1 = null;
+            Cube intersectedCube2 = null;
+
+            for (Cube cube : cubes) {
+                if (cube.isInside(ball1.center)) {
+                    intersectedCube1 = cube;
+                    break;
+                } else if (cube.nextCube != null && cube.nextCube.isInside(ball1.center)) {
+                    intersectedCube1 = cube.nextCube;
+                    break;
+                }
+            }
+
+            for (Cube cube : cubes) {
+                if (cube.isInside(ball2.center)) {
+                    intersectedCube2 = cube;
+                    break;
+                } else if (cube.nextCube != null && cube.nextCube.isInside(ball2.center)) {
+                    intersectedCube2 = cube.nextCube;
+                    break;
+                }
+            }
+
+            if ((intersectedCube1 == null || intersectedCube2 == null) && animator.isAnimating()) {
+                animator.stop();
+            } else if (intersectedCube1 != null && !intersectedCube1.hasBeenPassed) {
+                scoreP1++;
+                scoreP2++;
+                intersectedCube1.hasBeenPassed = true;
+
+                counterLabelP1.setText(scoreP1.toString());
+                counterLabelP2.setText(scoreP2.toString());
+            }
+
+            if (intersectedCube1 != null && intersectedCube1.diamond != null) {
+                float distanceP1 = (float) Math.sqrt(
+                        Math.pow((ball1.center.x - intersectedCube1.diamond.center.x), 2)
+                                + Math.pow((ball1.center.y - intersectedCube1.diamond.center.y), 2)
+                );
+                float distanceP2 = (float) Math.sqrt(
+                        Math.pow((ball2.center.x - intersectedCube1.diamond.center.x), 2)
+                                + Math.pow((ball2.center.y - intersectedCube1.diamond.center.y), 2)
+                );
+
+                if (distanceP1 <= (ball1.radius + intersectedCube1.diamond.radius)
+                        || distanceP2 <= (ball2.radius + intersectedCube1.diamond.radius)) {
+                    intersectedCube1.diamond = null;
+
+                    if (distanceP1 < distanceP2) {
+                        scoreP1 += 2;
+                        counterLabelP1.setText(scoreP1.toString());
+                    } else {
+                        scoreP2 += 2;
+                        counterLabelP2.setText(scoreP2.toString());
+                    }
+                }
             }
         }
 
-        if (intersectedCube == null) {
-            animator.stop();
-        } else if (!intersectedCube.hasBeenPassed) {
-            score++;
-            counterLabel.setText(score.toString());
-            intersectedCube.hasBeenPassed = true;
-        }
-
-        if (intersectedCube != null && intersectedCube.diamond != null) {
-            distance = (float) Math.sqrt(Math.pow((ball.center.x - intersectedCube.diamond.center.x), 2) + Math.pow((ball.center.y - intersectedCube.diamond.center.y), 2));
-            if (distance <= (ball.radius + intersectedCube.diamond.radius)) {
-                intersectedCube.diamond = null;
-                score += 2;
-                counterLabel.setText(score.toString());
-            }
-        }
         if (lastCube.centralMid.y - 0.3 <= 1) {
             lastCube.generateNewCube();
             cubes.add(lastCube.nextCube);
         }
-        ball.drawBall(gl, textures[0]);
-        ball.navigateBall();
+
+        ball1.drawBall(gl, textures[0]);
+        ball1.navigateBall();
+
+        if (ball2 != null) {
+            ball2.drawBall(gl, textures[5]);
+            ball2.navigateBall();
+        }
     }
 
     public void animateTitle(){
@@ -288,7 +374,15 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
 
     @Override
     public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+                ball1.isMovingRight = !ball1.isMovingRight;
+        }
 
+        if (e.getKeyCode() == KeyEvent.VK_A) {
+            if (ball2 != null) {
+                ball2.isMovingRight = !ball2.isMovingRight;
+            }
+        }
     }
 
     @Override
@@ -298,8 +392,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        ball.isMovingRight = !ball.isMovingRight;
-        gameState = GameState.PLAYING;
+
     }
 
     @Override
