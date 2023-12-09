@@ -1,5 +1,6 @@
 import Model.Ball;
 import Model.Cube;
+import Model.Diamond;
 import Texture.TextureReader;
 import com.sun.opengl.util.FPSAnimator;
 
@@ -24,6 +25,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     private FPSAnimator animator;
     public JLabel counterLabel;
     Integer score = -1;
+    float distance;
     private final String[] textureNames = {
             "Ball//ball.png", "Diamond//WithShadow//Diamond.png", "HowToPlay//Info.png", "Play//Play_button.png",
             "Sound//sound_On.png"
@@ -50,7 +52,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         initCubes();
     }
 
-    public void setCounterLabel(JLabel counterLabel){
+    public void setCounterLabel(JLabel counterLabel) {
         this.counterLabel = counterLabel;
     }
 
@@ -113,7 +115,6 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
             }
         }
     }
-
     @Override
     public void display(GLAutoDrawable glAutoDrawable) {
         GL gl = glAutoDrawable.getGL();
@@ -140,15 +141,22 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
             }
         }
 
-
         if (intersectedCube == null) {
             animator.stop();
-        } else if (!intersectedCube.hasBeenPassed){
+        } else if (!intersectedCube.hasBeenPassed) {
             score++;
             counterLabel.setText(score.toString());
             intersectedCube.hasBeenPassed = true;
         }
 
+        if (intersectedCube != null && intersectedCube.diamond != null) {
+            distance = (float) Math.sqrt(Math.pow((ball.center.x - intersectedCube.diamond.center.x), 2) + Math.pow((ball.center.y - intersectedCube.diamond.center.y), 2));
+            if (distance <= (ball.radius + intersectedCube.diamond.radius)) {
+                intersectedCube.diamond = null;
+                score += 2;
+                counterLabel.setText(score.toString());
+            }
+        }
         if (lastCube.centralMid.y - 0.3 <= 1) {
             lastCube.generateNewCube();
             cubes.add(lastCube.nextCube);
