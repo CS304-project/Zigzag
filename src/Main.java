@@ -23,8 +23,14 @@ public class Main extends JFrame  {
 
         counterLabelP1 = new JLabel();
         counterLabelP2 = new JLabel();
+        counterLabelP1.setFont(new Font("Myriad Arabic", Font.PLAIN, 24));
+        counterLabelP2.setFont(new Font("Myriad Arabic", Font.PLAIN, 24));
+
         scoreLabelP1 = new JLabel("score: ");
         scoreLabelP2 = new JLabel("score: ");
+        scoreLabelP1.setFont(new Font("Myriad Arabic", Font.PLAIN, 24));
+        scoreLabelP2.setFont(new Font("Myriad Arabic", Font.PLAIN, 24));
+
         jPanelP1 = new JPanel();
         jPanelP2 = new JPanel();
 
