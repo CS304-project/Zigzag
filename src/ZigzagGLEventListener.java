@@ -96,6 +96,8 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
                 new Point2D.Float(0, -0.3f)
         );
 
+        firstCube.diamond = null;
+
         firstCube.nextCube = new Cube(
                 new Point2D.Float(0.1f, 0.4f),
                 new Point2D.Float(0, 0.3f),
@@ -149,7 +151,6 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     @Override
     public void display(GLAutoDrawable glAutoDrawable) {
         GL gl = glAutoDrawable.getGL();
-        Cube lastCube = cubes.get(cubes.size() - 1);
 
         gl.glClear(GL.GL_COLOR_BUFFER_BIT);
         gl.glLoadIdentity();
@@ -187,10 +188,17 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         for (int i = cubes.size() - 1; i >= 0; i--) {
             Cube cube = cubes.get(i);
 
-            cube.drawCube(gl, textures[1]);
-            cube.animateCube();
-            if (cube.diamond != null)
-                cube.diamond.animateDiamond();
+            if (cube.centralMid.y <= - 0.6){
+                cube.animateFallingCube(gl, textures[1]);
+                if (cube.topMid.y <= -1){
+                    cubes.remove(i);
+                }
+            } else {
+                cube.drawCube(gl, textures[1]);
+                cube.animateCube();
+                if (cube.diamond != null)
+                    cube.diamond.animateDiamond();
+            }
         }
 
         if (mode == GameMode.SINGLE_PLAYER) {
