@@ -20,6 +20,7 @@ public class Main extends JFrame  {
         glCanvas = new GLCanvas();
         listener = new ZigzagGLEventListener();
         animator = new FPSAnimator(glCanvas, 265);
+
         counterLabelP1 = new JLabel();
         counterLabelP2 = new JLabel();
         scoreLabelP1 = new JLabel("score: ");
