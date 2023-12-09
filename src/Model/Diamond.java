@@ -5,7 +5,7 @@ import java.awt.geom.Point2D;
 
 public class Diamond {
     public Point2D.Float bottomLeft, bottomRight, topRight, topLeft , center;
-
+    public  float radius ;
     public Diamond(
             Point2D.Float bottomLeft,
             Point2D.Float bottomRight,
@@ -17,6 +17,7 @@ public class Diamond {
         this.topRight = topRight;
         this.topLeft = topLeft;
         this.center = new Point2D.Float((bottomRight.x + bottomLeft.x) / 2, (topLeft.y + bottomLeft.y) / 2);
+        this.radius = (float) Math.sqrt((center.x-topRight.x)*(center.x-topRight.x));
     }
 
     public void drawDiamond(GL gl, int texture) {
@@ -41,5 +42,6 @@ public class Diamond {
         topLeft.y -= 0.001f;
         bottomRight.y -= 0.001f;
         topRight.y -= 0.001f;
+        center.y -=0.001f;
     }
 }
