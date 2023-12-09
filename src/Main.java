@@ -31,11 +31,15 @@ public class Main extends JFrame  {
         jPanelP1.add(scoreLabelP1);
         jPanelP1.add(counterLabelP1);
         jPanelP1.setBackground(Color.white);
+        jPanelP1.setVisible(false);
 
         jPanelP2.add(scoreLabelP2);
         jPanelP2.add(counterLabelP2);
         jPanelP2.setBackground(Color.white);
+        jPanelP2.setVisible(false);
 
+        listener.setScorePanelP1(jPanelP1);
+        listener.setScorePanelP2(jPanelP2);
         listener.setCounterLabelP1(counterLabelP1);
         listener.setCounterLabelP2(counterLabelP2);
         listener.setGLCanvas(glCanvas);

@@ -27,6 +27,8 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     private FPSAnimator animator;
     public JLabel counterLabelP1;
     private JLabel counterLabelP2;
+    private JPanel scorePanelP1;
+    private JPanel scorePanelP2;
     Integer scoreP1 = -1;
     Integer scoreP2 = -1;
     float y = 0;
@@ -47,8 +49,13 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     public void setAnimator(FPSAnimator animator) {
         this.animator = animator;
     }
-    public void setScorePanel(JPanel scorePanel){
-        this.scorePanel = scorePanel;
+
+    public void setScorePanelP1(JPanel scorePanel){
+        this.scorePanelP1 = scorePanel;
+    }
+
+    public void setScorePanelP2(JPanel scorePanel) {
+        this.scorePanelP2 = scorePanel;
     }
 
     public ZigzagGLEventListener() {
@@ -58,7 +65,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
                 new Point2D.Float(0.025f, 0.025f),
                 new Point2D.Float(-0.025f, 0.025f)
         );
-        mode = GameMode.MULTIPLAYER;
+        mode = GameMode.SINGLE_PLAYER;
 
         if (mode == GameMode.MULTIPLAYER) {
             ball2 = new Ball(
@@ -88,6 +95,8 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
                 new Point2D.Float(0.3f, 0),
                 new Point2D.Float(0, -0.3f)
         );
+
+        firstCube.diamond = null;
 
         firstCube.nextCube = new Cube(
                 new Point2D.Float(0.1f, 0.4f),
@@ -142,7 +151,6 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     @Override
     public void display(GLAutoDrawable glAutoDrawable) {
         GL gl = glAutoDrawable.getGL();
-        Cube lastCube = cubes.get(cubes.size() - 1);
 
         gl.glClear(GL.GL_COLOR_BUFFER_BIT);
         gl.glLoadIdentity();
@@ -150,35 +158,47 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         if(gameState == GameState.WELCOME){
 
             animateTitle();
-            scorePanel.setVisible(false);
+            scorePanelP1.setVisible(false);
+            scorePanelP2.setVisible(false);
+
             for (int i = cubes.size() - 1; i >= 0; i--) {
                 Cube cube = cubes.get(i);
 
                 cube.drawCube(gl, textures[1]);
             }
-            ball.drawBall(gl, textures[0]);
+            ball1.drawBall(gl, textures[0]);
             drawSoundIcon(gl);
             drawInfoIcon(gl);
             drawTitle(gl);
             drawClickToPlay(gl);
 
         } else if (gameState == GameState.PLAYING) {
-            scorePanel.setVisible(true);
+            scorePanelP1.setVisible(true);
             drawingAnimatingCubes(gl);
+
+            if (mode == GameMode.MULTIPLAYER) {
+                scorePanelP2.setVisible(true);
+            }
         }
     }
 
     public void drawingAnimatingCubes(GL gl){
         Cube lastCube = cubes.get(cubes.size() - 1);
-        Cube intersectedCube = null;
 
         for (int i = cubes.size() - 1; i >= 0; i--) {
             Cube cube = cubes.get(i);
 
-            cube.drawCube(gl, textures[1]);
-            cube.animateCube();
-            if (cube.diamond != null)
-                cube.diamond.animateDiamond();
+            if (cube.centralMid.y <= - 0.6){
+                cube.animateFallingCube(gl, textures[1]);
+                if (cube.topMid.y <= -1){
+                    cubes.remove(i);
+                }
+            } else {
+                cube.drawCube(gl, textures[1]);
+                cube.animateCube();
+                if (cube.diamond != null)
+                    cube.diamond.animateDiamond();
+            }
         }
 
         if (mode == GameMode.SINGLE_PLAYER) {
@@ -279,7 +299,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         ball1.navigateBall();
 
         if (ball2 != null) {
-            ball2.drawBall(gl, textures[5]);
+            ball2.drawBall(gl, textures[8]);
             ball2.navigateBall();
         }
     }
@@ -392,7 +412,9 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
 
     @Override
     public void mouseClicked(MouseEvent e) {
-
+        if (gameState == GameState.WELCOME) {
+            gameState = GameState.PLAYING;
+        }
     }
 
     @Override
