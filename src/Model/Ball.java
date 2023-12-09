@@ -6,8 +6,9 @@ import java.awt.geom.Point2D;
 public class Ball {
     public Point2D.Float bottomLeft, bottomRight, topRight, topLeft, center;
     public boolean isMovingRight = true;
+    public  float radius ;
 
-    public Ball(
+     public Ball(
             Point2D.Float bottomLeft,
             Point2D.Float bottomRight,
             Point2D.Float topRight,
@@ -18,7 +19,8 @@ public class Ball {
         this.topRight = topRight;
         this.topLeft = topLeft;
         this.center = new Point2D.Float((topLeft.x + bottomRight.x) / 2, (topLeft.y + bottomRight.y) / 2);
-    }
+        this.radius = (float) Math.sqrt((center.x-topRight.x)*(center.x-topRight.x));
+     }
 
     public void drawBall(GL gl, int texture) {
         gl.glColor3f(1, 1, 1);
