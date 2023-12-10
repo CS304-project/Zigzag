@@ -20,8 +20,9 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Point2D;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class ZigzagGLEventListener implements GLEventListener, KeyListener, MouseListener {
     GLCanvas glCanvas;
@@ -33,11 +34,11 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     private JLabel counterLabelP2;
     private JLabel scoreP1label;
     private JLabel scoreP2label;
-    private JLabel highestScorelabel;
-    private JLabel winnerlabel;
+    private JLabel highestScoreLabel;
+    private JLabel winnerLabel;
     private JPanel scorePanelP1;
     private JPanel scorePanelP2;
-    private TextureReader text;
+    private final File txtFile;
     Integer scoreP1 = -1;
     Integer scoreP2 = -1;
     String  highestScore ;
@@ -82,12 +83,12 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         this.scoreP2label = scoreP2;
     }
 
-    public void setWinnerlabel(JLabel winner) {
-        this.winnerlabel = winner;
+    public void setWinnerLabel(JLabel winner) {
+        this.winnerLabel = winner;
     }
 
-    public void setHighestScorelabel(JLabel highestScore) {
-        this.highestScorelabel = highestScore;
+    public void setHighestScoreLabel(JLabel highestScore) {
+        this.highestScoreLabel = highestScore;
     }
 
     public ZigzagGLEventListener() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
@@ -98,11 +99,34 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
                 new Point2D.Float(-0.025f, 0.025f)
         );
         mode = GameMode.SINGLE_PLAYER;
-
-        initCubes();
         Tap = new Sound("assets/Sounds/start.wav");
         Moving = new Sound("assets/Sounds/moving.wav");
         Eating = new Sound("assets/Sounds/eat_diamond.wav");
+        highestScore = "0";
+        File file = new File("C://3JKM");
+
+        if (file.isDirectory()) {
+            txtFile = new File(file.getAbsolutePath() + "//score.txt");
+            if (txtFile.isFile()) {
+                BufferedReader br = new BufferedReader(new FileReader(txtFile.getAbsoluteFile()));
+
+                if (br.readLine() != null) {
+                    Scanner in = new Scanner(txtFile);
+                    highestScore = in.nextLine();
+                }
+            }
+        } else {
+            boolean isDirCreated = file.mkdir();
+
+            if (isDirCreated) {
+                txtFile = new File(file.getAbsolutePath() + "//score.txt");
+                boolean isFile = txtFile.createNewFile();
+            } else {
+                txtFile = null;
+            }
+        }
+
+        initCubes();
     }
 
     public void setCounterLabelP1(JLabel counterLabel) {
@@ -228,24 +252,30 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         } else if (gameState == GameState.GAME_OVER && animator.isAnimating()) {
             animator.stop();
             if (mode == GameMode.SINGLE_PLAYER) {
+                System.out.println(highestScore);
+                if (scoreP1 > Integer.parseInt(highestScore)) {
+                    highestScore = scoreP1.toString();
+
+                    updateScore();
+                }
                 drawGameOverMenuS(gl);
                 scoreP1label.setBounds(700, 306, 50, 50);
                 scoreP1label.setText(scoreP1.toString());
-                highestScorelabel.setBounds(750,360,50,50);
-                highestScorelabel.setText(highestScore);
+                highestScoreLabel.setBounds(750,360,50,50);
+                highestScoreLabel.setText(highestScore);
                 scoreP1label.setVisible(true);
-                highestScorelabel.setVisible(true);
+                highestScoreLabel.setVisible(true);
             } else {
                 drawGameOverMenuM(gl);
                 scoreP1label.setBounds(670, 280, 50, 50);
                 scoreP1label.setText(scoreP1.toString());
                 scoreP2label.setBounds(670, 335, 50, 50);
                 scoreP2label.setText(scoreP2.toString());
-                winnerlabel.setBounds(720,402,50,50);
-                winnerlabel.setText(ball2.isFalling ? "Black" : ball1.isFalling ? "Red" : "Draw");
+                winnerLabel.setBounds(720,402,50,50);
+                winnerLabel.setText(ball2.isFalling ? "Black" : ball1.isFalling ? "Red" : "Draw");
                 scoreP1label.setVisible(true);
                 scoreP2label.setVisible(true);
-                winnerlabel.setVisible(true);
+                winnerLabel.setVisible(true);
             }
         }
     }
@@ -259,6 +289,18 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         }
         PauseMenuHome(gl);
         PauseMenuResume(gl);
+    }
+
+    private void updateScore() {
+        try {
+            if (txtFile != null) {
+                PrintWriter out = new PrintWriter(txtFile.getAbsoluteFile());
+                out.println(scoreP1);
+                out.close();
+            }
+        } catch (IOException e) {
+            System.out.println("IOException: " + e.getMessage());
+        }
     }
 
     public void drawingAnimatingCubes(GL gl) {
@@ -635,8 +677,8 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
 
         scoreP2label.setVisible(false);
         scoreP1label.setVisible(false);
-        winnerlabel.setVisible(false);
-        highestScorelabel.setVisible(false);
+        winnerLabel.setVisible(false);
+        highestScoreLabel.setVisible(false);
 
 
         initCubes();
