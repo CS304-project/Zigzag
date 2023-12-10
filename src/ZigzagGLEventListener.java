@@ -252,7 +252,6 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         } else if (gameState == GameState.GAME_OVER && animator.isAnimating()) {
             animator.stop();
             if (mode == GameMode.SINGLE_PLAYER) {
-                System.out.println(highestScore);
                 if (scoreP1 > Integer.parseInt(highestScore)) {
                     highestScore = scoreP1.toString();
 
