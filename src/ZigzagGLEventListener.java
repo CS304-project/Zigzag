@@ -195,7 +195,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
             multiPlayerBTN(gl);
             singlePlayerBTN(gl);
         } else if (gameState == GameState.PLAYING) {
-            Tap.Start();
+            if(!isMuted)Tap.Start();
             gl.glClear(GL.GL_COLOR_BUFFER_BIT);
             scorePanelP1.setVisible(true);
             drawingAnimatingCubes(gl);
@@ -263,8 +263,10 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
                 if (distance <= (ball1.radius + intersectedCube.diamond.radius)) {
                     intersectedCube.diamond = null;
                     scoreP1 += 2;
-                    Eating.Reset();
-                    Eating.Start();
+                    if (!isMuted) {
+                        Eating.Reset();
+                        Eating.Start();
+                    }
                     counterLabelP1.setText(scoreP1.toString());
                 }
             }
@@ -320,13 +322,17 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
 
                     if (distanceP1 < distanceP2) {
                         scoreP1 += 2;
-                        Eating.Reset();
-                        Eating.Start();
+                        if(!isMuted){
+                            Eating.Reset();
+                            Eating.Start();
+                        }
                         counterLabelP1.setText(scoreP1.toString());
                     } else {
                         scoreP2 += 2;
-                        Eating.Reset();
-                        Eating.Start();
+                        if(!isMuted){
+                            Eating.Reset();
+                            Eating.Start();
+                        }
                         counterLabelP2.setText(scoreP2.toString());
                     }
                 }
@@ -536,14 +542,18 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     public void keyPressed(KeyEvent e) {
         if (gameState == GameState.PLAYING) {
             if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-                Moving.Reset();
-                Moving.Start();
+                if(!isMuted){
+                    Moving.Reset();
+                    Moving.Start();
+                }
                 ball1.isMovingRight = !ball1.isMovingRight;
             }
 
             if (e.getKeyCode() == KeyEvent.VK_A) {
-                Moving.Reset();
-                Moving.Start();
+                if(!isMuted){
+                    Moving.Reset();
+                    Moving.Start();
+                }
                 if (ball2 != null) {
                     ball2.isMovingRight = !ball2.isMovingRight;
                 }
