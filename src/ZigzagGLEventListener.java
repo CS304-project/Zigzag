@@ -2,6 +2,7 @@ import Config.GameState;
 import Config.GameMode;
 import Model.Ball;
 import Model.Cube;
+import Model.Sound;
 import Texture.TextureReader;
 import com.sun.opengl.util.FPSAnimator;
 
@@ -10,6 +11,8 @@ import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -43,6 +46,9 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
             "Pause//Background.png", "Pause//home.png", "GameMode//multiPlayer.png", "GameMode//singlePlayer.png",
             "Home//sound_Off.png"
     };
+    private final Sound Tap;
+    private final Sound Moving ;
+    private final Sound Eating ;
     private final TextureReader.Texture[] texture = new TextureReader.Texture[textureNames.length];
     private final int[] textures = new int[textureNames.length];
 
@@ -62,7 +68,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         this.scorePanelP2 = scorePanel;
     }
 
-    public ZigzagGLEventListener() {
+    public ZigzagGLEventListener() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
         ball1 = new Ball(
                 new Point2D.Float(-0.025f, -0.025f),
                 new Point2D.Float(0.025f, -0.025f),
@@ -72,6 +78,9 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         mode = GameMode.SINGLE_PLAYER;
 
         initCubes();
+       Tap = new Sound("assets/Sounds/start.wav");
+       Moving = new Sound("assets/Sounds/moving.wav");
+       Eating = new Sound("assets/Sounds/eat_diamond.wav");
     }
 
     public void setCounterLabelP1(JLabel counterLabel) {
@@ -173,6 +182,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
             drawClickToPlay(gl);
 
         } else if (gameState == GameState.PLAYING) {
+            Tap.Start();
             gl.glClear(GL.GL_COLOR_BUFFER_BIT);
             scorePanelP1.setVisible(true);
             drawingAnimatingCubes(gl);
@@ -217,7 +227,6 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
 
         if (mode == GameMode.SINGLE_PLAYER) {
             Cube intersectedCube = null;
-
             for (Cube cube : cubes) {
                 if (cube.isInside(ball1.center)) {
                     intersectedCube = cube;
@@ -241,6 +250,8 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
                 if (distance <= (ball1.radius + intersectedCube.diamond.radius)) {
                     intersectedCube.diamond = null;
                     scoreP1 += 2;
+                    Eating.Reset();
+                    Eating.Start();
                     counterLabelP1.setText(scoreP1.toString());
                 }
             }
@@ -273,6 +284,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
             } else if (intersectedCube1 != null && !intersectedCube1.hasBeenPassed) {
                 scoreP1++;
                 scoreP2++;
+
                 intersectedCube1.hasBeenPassed = true;
 
                 counterLabelP1.setText(scoreP1.toString());
@@ -295,9 +307,13 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
 
                     if (distanceP1 < distanceP2) {
                         scoreP1 += 2;
+                        Eating.Reset();
+                        Eating.Start();
                         counterLabelP1.setText(scoreP1.toString());
                     } else {
                         scoreP2 += 2;
+                        Eating.Reset();
+                        Eating.Start();
                         counterLabelP2.setText(scoreP2.toString());
                     }
                 }
@@ -475,10 +491,14 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     public void keyPressed(KeyEvent e) {
         if (gameState == GameState.PLAYING) {
             if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+                Moving.Reset();
+                Moving.Start();
                 ball1.isMovingRight = !ball1.isMovingRight;
             }
 
             if (e.getKeyCode() == KeyEvent.VK_A) {
+                Moving.Reset();
+                Moving.Start();
                 if (ball2 != null) {
                     ball2.isMovingRight = !ball2.isMovingRight;
                 }
