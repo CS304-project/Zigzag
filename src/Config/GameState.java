@@ -4,5 +4,6 @@ public enum GameState {
     WELCOME,
     CHOOSE_MODE,
     PLAYING,
-    PAUSED
+    PAUSED,
+    GAME_OVER
 }
