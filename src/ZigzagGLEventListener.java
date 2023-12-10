@@ -587,6 +587,21 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         gl.glDisable(GL.GL_BLEND);
     }
 
+    public void reset() {
+        cubes.clear();
+        ball1 = new Ball(
+                new Point2D.Float(-0.025f, -0.025f),
+                new Point2D.Float(0.025f, -0.025f),
+                new Point2D.Float(0.025f, 0.025f),
+                new Point2D.Float(-0.025f, 0.025f)
+        );
+        ball2 = null;
+        scoreP1 = -1;
+        scoreP2 = -1;
+        initCubes();
+        gameState = GameState.WELCOME;
+    }
+
     @Override
     public void reshape(GLAutoDrawable glAutoDrawable, int i, int i1, int i2, int i3) {
 
@@ -673,33 +688,13 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
             if (xPos <= 0.22 && xPos >= 0.111 && yPos <= 0.05 && yPos >= -0.122) {
                 gameState = GameState.PLAYING;
             } else if (xPos <= 0.05 && xPos >= -0.05 && yPos <= 0.05 && yPos >= -0.122) {
-                cubes.clear();
-                ball1 = new Ball(
-                        new Point2D.Float(-0.025f, -0.025f),
-                        new Point2D.Float(0.025f, -0.025f),
-                        new Point2D.Float(0.025f, 0.025f),
-                        new Point2D.Float(-0.025f, 0.025f)
-                );
-                initCubes();
-                ball2 = null;
-                gameState = GameState.WELCOME;
+                reset();
             } else if (xPos <= -0.111 && xPos >= -0.22 && yPos <= 0.05 && yPos >= -0.122) {
                 isMuted = !isMuted;
             }
         } else if (gameState == GameState.GAME_OVER) {
             if (xPos <= 0.079 && xPos >= -0.076 && yPos <= -0.094 && yPos >= -0.194){
-                cubes.clear();
-                ball1 = new Ball(
-                        new Point2D.Float(-0.025f, -0.025f),
-                        new Point2D.Float(0.025f, -0.025f),
-                        new Point2D.Float(0.025f, 0.025f),
-                        new Point2D.Float(-0.025f, 0.025f)
-                );
-                ball2 = null;
-                scoreP1 = -1;
-                scoreP2 = -1;
-                initCubes();
-                gameState = GameState.WELCOME;
+                reset();
                 animator.start();
             }
         }
