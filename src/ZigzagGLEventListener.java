@@ -11,6 +11,7 @@ import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -22,7 +23,7 @@ import java.util.ArrayList;
 public class ZigzagGLEventListener implements GLEventListener, KeyListener, MouseListener {
     GLCanvas glCanvas;
     ArrayList<Cube> cubes = new ArrayList<>();
-    private final Ball ball1;
+    private Ball ball1;
     private Ball ball2;
     private FPSAnimator animator;
     public JLabel counterLabelP1;
@@ -35,9 +36,12 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     boolean isGoingUp = true;
     GameState gameState = GameState.WELCOME;
     private GameMode mode;
+    boolean isMuted = false;
     private final String[] textureNames = {
-            "Ball//ball.png", "Diamond//WithShadow//Diamond.png", "Home//Info.png", "Home//Play_button.png",
-            "Home//sound_On.png","Home//TapToPlay.png", "Home//title.png", "EndGame//GameOver.png",  "Ball//ball2.png"
+            "Ball//ball.png", "Diamond//WithShadow//Diamond_with_shadow.png", "Home//Info.png", "Pause//Play_button.png",
+            "Home//sound_On.png", "Home//TapToPlay.png", "Home//title.png", "EndGame//GameOver.png", "Ball//ball2.png",
+            "Pause//Background.png", "Pause//home.png", "GameMode//multiPlayer.png", "GameMode//singlePlayer.png",
+            "Home//sound_Off.png"
     };
     private final TextureReader.Texture[] texture = new TextureReader.Texture[textureNames.length];
     private final int[] textures = new int[textureNames.length];
@@ -50,7 +54,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         this.animator = animator;
     }
 
-    public void setScorePanelP1(JPanel scorePanel){
+    public void setScorePanelP1(JPanel scorePanel) {
         this.scorePanelP1 = scorePanel;
     }
 
@@ -66,15 +70,6 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
                 new Point2D.Float(-0.025f, 0.025f)
         );
         mode = GameMode.SINGLE_PLAYER;
-
-        if (mode == GameMode.MULTIPLAYER) {
-            ball2 = new Ball(
-                    new Point2D.Float(-0.05f, -0.025f),
-                    new Point2D.Float(0, -0.025f),
-                    new Point2D.Float(0, 0.025f),
-                    new Point2D.Float(-0.05f, 0.025f)
-            );
-        }
 
         initCubes();
     }
@@ -148,14 +143,15 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
             }
         }
     }
+
     @Override
     public void display(GLAutoDrawable glAutoDrawable) {
         GL gl = glAutoDrawable.getGL();
 
-        gl.glClear(GL.GL_COLOR_BUFFER_BIT);
         gl.glLoadIdentity();
 
-        if(gameState == GameState.WELCOME){
+        if (gameState == GameState.WELCOME) {
+            gl.glClear(GL.GL_COLOR_BUFFER_BIT);
 
             animateTitle();
             scorePanelP1.setVisible(false);
@@ -167,30 +163,48 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
                 cube.drawCube(gl, textures[1]);
             }
             ball1.drawBall(gl, textures[0]);
-            drawSoundIcon(gl);
+            if (isMuted){
+                drawSoundIcon(gl, textures[13]);
+            } else {
+                drawSoundIcon(gl, textures[4]);
+            }
             drawInfoIcon(gl);
             drawTitle(gl);
             drawClickToPlay(gl);
 
         } else if (gameState == GameState.PLAYING) {
+            gl.glClear(GL.GL_COLOR_BUFFER_BIT);
             scorePanelP1.setVisible(true);
             drawingAnimatingCubes(gl);
 
             if (mode == GameMode.MULTIPLAYER) {
                 scorePanelP2.setVisible(true);
             }
+        } else if (gameState == GameState.PAUSED) {
+            drawPauseMenu(gl);
         }
     }
 
-    public void drawingAnimatingCubes(GL gl){
+    public void drawPauseMenu(GL gl) {
+        drawPauseMenuBG(gl);
+        if (isMuted){
+            PauseMenuSound(gl, textures[13]);
+        } else {
+            PauseMenuSound(gl, textures[4]);
+        }
+        PauseMenuHome(gl);
+        PauseMenuResume(gl);
+    }
+
+    public void drawingAnimatingCubes(GL gl) {
         Cube lastCube = cubes.get(cubes.size() - 1);
 
         for (int i = cubes.size() - 1; i >= 0; i--) {
             Cube cube = cubes.get(i);
 
-            if (cube.centralMid.y <= - 0.6){
+            if (cube.centralMid.y <= -0.6) {
                 cube.animateFallingCube(gl, textures[1]);
-                if (cube.topMid.y <= -1){
+                if (cube.topMid.y <= -1) {
                     cubes.remove(i);
                 }
             } else {
@@ -304,75 +318,140 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         }
     }
 
-    public void animateTitle(){
-        if(isGoingUp){
+    public void animateTitle() {
+        if (isGoingUp) {
             y += 0.0005f;
-        }else {
+        } else {
             y -= 0.0005f;
         }
-        if(y > 0.05) isGoingUp = false;
+        if (y > 0.05) isGoingUp = false;
         else if (y < -0.05) isGoingUp = true;
     }
-    public void drawSoundIcon(GL gl){
+
+    public void drawSoundIcon(GL gl, int texture) {
         gl.glEnable(gl.GL_BLEND);
-        gl.glBindTexture(GL.GL_TEXTURE_2D, textures[4]);
+        gl.glBindTexture(GL.GL_TEXTURE_2D, texture);
         gl.glBegin(gl.GL_QUADS);
-        gl.glTexCoord2f(0,0);
-        gl.glVertex2d(-0.25,-0.40);
-        gl.glTexCoord2f(1,0);
+        gl.glTexCoord2f(0, 0);
+        gl.glVertex2d(-0.25, -0.40);
+        gl.glTexCoord2f(1, 0);
         gl.glVertex2d(-0.05, -0.40);
-        gl.glTexCoord2f(1,1);
-        gl.glVertex2d(-0.05,-0.20);
-        gl.glTexCoord2f(0,1);
-        gl.glVertex2d(-0.25,-0.20);
+        gl.glTexCoord2f(1, 1);
+        gl.glVertex2d(-0.05, -0.20);
+        gl.glTexCoord2f(0, 1);
+        gl.glVertex2d(-0.25, -0.20);
         gl.glEnd();
         gl.glDisable(GL.GL_BLEND);
     }
 
-    public void drawInfoIcon(GL gl){
+    public void drawInfoIcon(GL gl) {
         gl.glEnable(gl.GL_BLEND);
         gl.glBindTexture(GL.GL_TEXTURE_2D, textures[2]);
         gl.glBegin(GL.GL_QUADS);
-        gl.glTexCoord2f(0,0);
-        gl.glVertex2d(0.25,-0.40);
-        gl.glTexCoord2f(1,0);
+        gl.glTexCoord2f(0, 0);
+        gl.glVertex2d(0.25, -0.40);
+        gl.glTexCoord2f(1, 0);
         gl.glVertex2d(0.05, -0.40);
-        gl.glTexCoord2f(1,1);
-        gl.glVertex2d(0.05,-0.20);
-        gl.glTexCoord2f(0,1);
-        gl.glVertex2d(0.25,-0.20);
+        gl.glTexCoord2f(1, 1);
+        gl.glVertex2d(0.05, -0.20);
+        gl.glTexCoord2f(0, 1);
+        gl.glVertex2d(0.25, -0.20);
         gl.glEnd();
         gl.glDisable(GL.GL_BLEND);
     }
 
-    public void drawTitle(GL gl){
+    public void drawTitle(GL gl) {
         gl.glEnable(gl.GL_BLEND);
         gl.glBindTexture(GL.GL_TEXTURE_2D, textures[6]);
         gl.glBegin(GL.GL_QUADS);
-        gl.glTexCoord2f(0,1);
-        gl.glVertex2d(-0.25,0.9);
-        gl.glTexCoord2f(1,1);
+        gl.glTexCoord2f(0, 1);
+        gl.glVertex2d(-0.25, 0.9);
+        gl.glTexCoord2f(1, 1);
         gl.glVertex2d(0.25, 0.9);
-        gl.glTexCoord2f(1,0);
-        gl.glVertex2d(0.25,0.7);
-        gl.glTexCoord2f(0,0);
-        gl.glVertex2d(-0.25,0.7);
+        gl.glTexCoord2f(1, 0);
+        gl.glVertex2d(0.25, 0.7);
+        gl.glTexCoord2f(0, 0);
+        gl.glVertex2d(-0.25, 0.7);
         gl.glEnd();
         gl.glDisable(GL.GL_BLEND);
     }
 
-    public void drawClickToPlay(GL gl){
+    public void drawClickToPlay(GL gl) {
         gl.glEnable(gl.GL_BLEND);
         gl.glBindTexture(GL.GL_TEXTURE_2D, textures[5]);
         gl.glBegin(GL.GL_QUADS);
-        gl.glTexCoord2f(0,1);
-        gl.glVertex2d(-0.15,0.30+y);
-        gl.glTexCoord2f(1,1);
-        gl.glVertex2d(0.15, 0.30+y);
-        gl.glTexCoord2f(1,0);
-        gl.glVertex2d(0.15,0.20+y);
-        gl.glTexCoord2f(0,0);
-        gl.glVertex2d(-0.15,0.20+y);
+        gl.glTexCoord2f(0, 1);
+        gl.glVertex2d(-0.15, 0.30 + y);
+        gl.glTexCoord2f(1, 1);
+        gl.glVertex2d(0.15, 0.30 + y);
+        gl.glTexCoord2f(1, 0);
+        gl.glVertex2d(0.15, 0.20 + y);
+        gl.glTexCoord2f(0, 0);
+        gl.glVertex2d(-0.15, 0.20 + y);
+        gl.glEnd();
+        gl.glDisable(GL.GL_BLEND);
+    }
+
+    public void drawPauseMenuBG(GL gl) {
+        gl.glEnable(gl.GL_BLEND);
+        gl.glBindTexture(GL.GL_TEXTURE_2D, textures[9]);
+        gl.glBegin(gl.GL_QUADS);
+        gl.glTexCoord2f(0, 0);
+        gl.glVertex2d(-0.5, -0.5);
+        gl.glTexCoord2f(1, 0);
+        gl.glVertex2d(0.5, -0.5);
+        gl.glTexCoord2f(1, 1);
+        gl.glVertex2d(0.5, 0.5);
+        gl.glTexCoord2f(0, 1);
+        gl.glVertex2d(-0.5, 0.5);
+        gl.glEnd();
+        gl.glDisable(GL.GL_BLEND);
+    }
+
+    public void PauseMenuSound(GL gl, int texture) {
+        gl.glEnable(gl.GL_BLEND);
+        gl.glBindTexture(GL.GL_TEXTURE_2D, texture);
+        gl.glBegin(gl.GL_QUADS);
+        gl.glTexCoord2f(0, 0);
+        gl.glVertex2d(-0.5, -0.3);
+        gl.glTexCoord2f(1, 0);
+        gl.glVertex2d(-0.167, -0.3);
+        gl.glTexCoord2f(1, 1);
+        gl.glVertex2d(-0.167, 0.15);
+        gl.glTexCoord2f(0, 1);
+        gl.glVertex2d(-0.5, 0.15);
+        gl.glEnd();
+        gl.glDisable(GL.GL_BLEND);
+    }
+
+    public void PauseMenuHome(GL gl) {
+        gl.glEnable(gl.GL_BLEND);
+        gl.glBindTexture(GL.GL_TEXTURE_2D, textures[10]);
+        gl.glBegin(gl.GL_QUADS);
+        gl.glTexCoord2f(0, 0);
+        gl.glVertex2d(-0.167, -0.3);
+        gl.glTexCoord2f(1, 0);
+        gl.glVertex2d(0.167, -0.3);
+        gl.glTexCoord2f(1, 1);
+        gl.glVertex2d(0.167, 0.15);
+        gl.glTexCoord2f(0, 1);
+        gl.glVertex2d(-0.167, 0.15);
+        gl.glEnd();
+        gl.glDisable(GL.GL_BLEND);
+    }
+
+    public void PauseMenuResume(GL gl) {
+        gl.glEnable(gl.GL_BLEND);
+        gl.glBindTexture(GL.GL_TEXTURE_2D, textures[3]);
+        gl.glBegin(gl.GL_QUADS);
+        gl.glTexCoord2f(0, 0);
+        gl.glVertex2d(0.167, -0.3);
+        gl.glTexCoord2f(1, 0);
+        gl.glVertex2d(0.5, -0.3);
+        gl.glTexCoord2f(1, 1);
+        gl.glVertex2d(0.5, 0.15);
+        gl.glTexCoord2f(0, 1);
+        gl.glVertex2d(0.167, 0.15);
         gl.glEnd();
         gl.glDisable(GL.GL_BLEND);
     }
@@ -394,13 +473,25 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+        if (gameState == GameState.PLAYING) {
+            if (e.getKeyCode() == KeyEvent.VK_SPACE) {
                 ball1.isMovingRight = !ball1.isMovingRight;
+            }
+
+            if (e.getKeyCode() == KeyEvent.VK_A) {
+                if (ball2 != null) {
+                    ball2.isMovingRight = !ball2.isMovingRight;
+                }
+            }
         }
 
-        if (e.getKeyCode() == KeyEvent.VK_A) {
-            if (ball2 != null) {
-                ball2.isMovingRight = !ball2.isMovingRight;
+        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+            if (gameState == GameState.PLAYING) {
+                gameState = GameState.PAUSED;
+            } else if (gameState == GameState.PAUSED) {
+                gameState = GameState.PLAYING;
+            } else if (gameState == GameState.CHOOSE_MODE) {
+                gameState = GameState.WELCOME;
             }
         }
     }
@@ -412,8 +503,37 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        float x = e.getX();
+        float y = e.getY();
+        Component c = e.getComponent();
+        float width = c.getWidth();
+        float height = c.getHeight();
+        float xPos = (x - width / 2) / width;
+        float yPos = (height / 2 - y) / height;
         if (gameState == GameState.WELCOME) {
-            gameState = GameState.PLAYING;
+            if (xPos <= -0.04 && xPos >= -0.108 && yPos <= -0.110 && yPos >= -0.187) {
+                isMuted = !isMuted;
+            } else {
+                gameState = GameState.PLAYING;
+            }
+        }
+        if (gameState == GameState.PAUSED) {
+            if (xPos <= 0.22 && xPos >= 0.111 && yPos <= 0.05 && yPos >= -0.122) {
+                gameState = GameState.PLAYING;
+            } else if (xPos <= 0.05 && xPos >= -0.05 && yPos <= 0.05 && yPos >= -0.122) {
+                cubes.clear();
+                ball1 = new Ball(
+                        new Point2D.Float(-0.025f, -0.025f),
+                        new Point2D.Float(0.025f, -0.025f),
+                        new Point2D.Float(0.025f, 0.025f),
+                        new Point2D.Float(-0.025f, 0.025f)
+                );
+                initCubes();
+                ball2 = null;
+                gameState = GameState.WELCOME;
+            } else if (xPos <= -0.111 && xPos >= -0.22 && yPos <= 0.05 && yPos >= -0.122) {
+                isMuted = !isMuted;
+            }
         }
     }
 
