@@ -1,8 +1,11 @@
 import com.sun.opengl.util.FPSAnimator;
 
 import javax.media.opengl.GLCanvas;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 
 public class Main extends JFrame  {
     public Main() {
@@ -58,8 +61,12 @@ public class Main extends JFrame  {
             setLocationRelativeTo(this);
             setVisible(true);
             animator.start();
-        } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
+        } catch (LineUnavailableException e) {
+            System.out.println("LineUnavailableException : " + e.getMessage());
+        }catch (UnsupportedAudioFileException e) {
+            System.out.println("UnsupportedAudioFileException : " + e.getMessage());
+        }catch (IOException e) {
+            System.out.println("IOException : " + e.getMessage());
         }
     }
 
