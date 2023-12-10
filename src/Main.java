@@ -33,11 +33,8 @@ public class Main extends JFrame  {
             counterLabelP2.setForeground(Color.RED);
 
             scoreLabelP1.setFont(new Font("Myriad Arabic", Font.PLAIN, 24));
-
-
             scoreLabelP2.setFont(new Font("Myriad Arabic", Font.PLAIN, 24));
             scoreLabelP2.setForeground(Color.RED);
-
 
             jPanelP1.add(scoreLabelP1);
             jPanelP1.add(counterLabelP1);
@@ -49,7 +46,6 @@ public class Main extends JFrame  {
             jPanelP2.add(counterLabelP2);
             jPanelP2.setBounds(0, 0, 150, 40);
             jPanelP2.setOpaque(false);
-
             jPanelP2.setVisible(false);
 
             listener.setScorePanelP1(jPanelP1);
@@ -60,20 +56,14 @@ public class Main extends JFrame  {
             listener.setAnimator(animator);
             listener.setScoreP1label(scoreP1);
             listener.setScoreP2label(scoreP2);
-            listener.setHighestScorelabel(highestScore);
-            listener.setWinnerlabel(winner);
+            listener.setHighestScoreLabel(highestScore);
+            listener.setWinnerLabel(winner);
 
             glCanvas.addGLEventListener(listener);
             glCanvas.addMouseListener(listener);
             glCanvas.addKeyListener(listener);
             glCanvas.setBounds(0, 0, 1280, 800);
             glCanvas.setFocusable(true);
-
-//            scoreP1.setBounds(700,306,50,50); in single mode
-//            highestScore.setBounds(750,360,50,50);
-//            scoreP1.setBounds(670,280,50,50); in  multi
-//            scoreP2.setBounds(670,335,50,50);
-//            winner.setBounds(720,402,50,50);
 
             lp.setPreferredSize(new Dimension(1280, 800));
             lp.add(jPanelP1, 0);
@@ -83,6 +73,7 @@ public class Main extends JFrame  {
             lp.add(winner,4);
             lp.add(highestScore,5);
             lp.add(glCanvas, 6);
+
             add(lp, BorderLayout.CENTER);
             setLocationRelativeTo(this);
             setDefaultCloseOperation(EXIT_ON_CLOSE);
