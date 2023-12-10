@@ -17,27 +17,32 @@ public class Main extends JFrame  {
             FPSAnimator animator = new FPSAnimator(glCanvas, 265);
             JLabel counterLabelP1 = new JLabel();
             JLabel counterLabelP2 = new JLabel();
-
-            counterLabelP1.setFont(new Font("Myriad Arabic", Font.PLAIN, 24));
-            counterLabelP2.setFont(new Font("Myriad Arabic", Font.PLAIN, 24));
-
+            JLayeredPane lp = new JLayeredPane();
+            JPanel jPanelP1 = new JPanel();
+            JPanel jPanelP2 = new JPanel();
             JLabel scoreLabelP1 = new JLabel("score: ");
             JLabel scoreLabelP2 = new JLabel("score: ");
 
-            scoreLabelP1.setFont(new Font("Myriad Arabic", Font.PLAIN, 24));
-            scoreLabelP2.setFont(new Font("Myriad Arabic", Font.PLAIN, 24));
+            counterLabelP1.setFont(new Font("Myriad Arabic", Font.PLAIN, 24));
 
-            JPanel jPanelP1 = new JPanel();
-            JPanel jPanelP2 = new JPanel();
+            counterLabelP2.setFont(new Font("Myriad Arabic", Font.PLAIN, 24));
+            counterLabelP2.setForeground(Color.RED);
+
+            scoreLabelP1.setFont(new Font("Myriad Arabic", Font.PLAIN, 24));
+
+            scoreLabelP2.setFont(new Font("Myriad Arabic", Font.PLAIN, 24));
+            scoreLabelP2.setForeground(Color.RED);
 
             jPanelP1.add(scoreLabelP1);
             jPanelP1.add(counterLabelP1);
-            jPanelP1.setBackground(Color.white);
+            jPanelP1.setBackground(Color.WHITE);
+            jPanelP1.setBounds(1080, 0, 200, 100);
             jPanelP1.setVisible(false);
 
             jPanelP2.add(scoreLabelP2);
             jPanelP2.add(counterLabelP2);
-            jPanelP2.setBackground(Color.white);
+            jPanelP2.setBackground(Color.WHITE);
+            jPanelP2.setBounds(0, 0, 200, 100);
             jPanelP2.setVisible(false);
 
             listener.setScorePanelP1(jPanelP1);
@@ -50,11 +55,15 @@ public class Main extends JFrame  {
             glCanvas.addGLEventListener(listener);
             glCanvas.addMouseListener(listener);
             glCanvas.addKeyListener(listener);
+            glCanvas.setBounds(0, 0, 1280, 800);
             glCanvas.setFocusable(true);
 
-            add(glCanvas);
-            add(jPanelP1, BorderLayout.EAST);
-            add(jPanelP2, BorderLayout.WEST);
+            lp.setPreferredSize(new Dimension(1280, 800));
+            lp.add(jPanelP1, 0);
+            lp.add(jPanelP2, 1);
+            lp.add(glCanvas, 2);
+
+            add(lp, BorderLayout.CENTER);
             setLocationRelativeTo(this);
             setDefaultCloseOperation(EXIT_ON_CLOSE);
             setSize(1280, 800);
