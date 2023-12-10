@@ -172,6 +172,19 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
             drawTitle(gl);
             drawClickToPlay(gl);
 
+        } else if (gameState == GameState.CHOOSE_MODE) {
+            gl.glClear(GL.GL_COLOR_BUFFER_BIT);
+
+            for (int i = cubes.size() - 1; i >= 0; i--) {
+                Cube cube = cubes.get(i);
+
+                cube.drawCube(gl, textures[1]);
+            }
+            ball1.drawBall(gl, textures[0]);
+
+            drawTitle(gl);
+            multiPlayerBTN(gl);
+            singlePlayerBTN(gl);
         } else if (gameState == GameState.PLAYING) {
             gl.glClear(GL.GL_COLOR_BUFFER_BIT);
             scorePanelP1.setVisible(true);
@@ -456,6 +469,38 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         gl.glDisable(GL.GL_BLEND);
     }
 
+    public void multiPlayerBTN(GL gl) {
+        gl.glEnable(gl.GL_BLEND);
+        gl.glBindTexture(GL.GL_TEXTURE_2D, textures[11]);
+        gl.glBegin(gl.GL_QUADS);
+        gl.glTexCoord2f(0, 0);
+        gl.glVertex2d(-0.8, -0.3);
+        gl.glTexCoord2f(1, 0);
+        gl.glVertex2d(-0.167, -0.3);
+        gl.glTexCoord2f(1, 1);
+        gl.glVertex2d(-0.167, 0.15);
+        gl.glTexCoord2f(0, 1);
+        gl.glVertex2d(-0.8, 0.15);
+        gl.glEnd();
+        gl.glDisable(GL.GL_BLEND);
+    }
+
+    public void singlePlayerBTN(GL gl) {
+        gl.glEnable(gl.GL_BLEND);
+        gl.glBindTexture(GL.GL_TEXTURE_2D, textures[12]);
+        gl.glBegin(gl.GL_QUADS);
+        gl.glTexCoord2f(0, 0);
+        gl.glVertex2d(0.167, -0.3);
+        gl.glTexCoord2f(1, 0);
+        gl.glVertex2d(0.8, -0.3);
+        gl.glTexCoord2f(1, 1);
+        gl.glVertex2d(0.8, 0.15);
+        gl.glTexCoord2f(0, 1);
+        gl.glVertex2d(0.167, 0.15);
+        gl.glEnd();
+        gl.glDisable(GL.GL_BLEND);
+    }
+
     @Override
     public void reshape(GLAutoDrawable glAutoDrawable, int i, int i1, int i2, int i3) {
 
@@ -514,10 +559,23 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
             if (xPos <= -0.04 && xPos >= -0.108 && yPos <= -0.110 && yPos >= -0.187) {
                 isMuted = !isMuted;
             } else {
+                gameState = GameState.CHOOSE_MODE;
+            }
+        } else if (gameState == GameState.CHOOSE_MODE){
+            if (xPos <= 0.391 && xPos >= 0.091 && yPos <= 0.06 && yPos >= -0.132) {
+                mode = GameMode.SINGLE_PLAYER;
+                gameState = GameState.PLAYING;
+            } else if (xPos <= -0.091 && xPos >= -0.391 && yPos <= 0.06 && yPos >= -0.132) {
+                ball2 = new Ball(
+                        new Point2D.Float(-0.05f, -0.025f),
+                        new Point2D.Float(0, -0.025f),
+                        new Point2D.Float(0, 0.025f),
+                        new Point2D.Float(-0.05f, 0.025f)
+                );
+                mode = GameMode.MULTIPLAYER;
                 gameState = GameState.PLAYING;
             }
-        }
-        if (gameState == GameState.PAUSED) {
+        } else if (gameState == GameState.PAUSED) {
             if (xPos <= 0.22 && xPos >= 0.111 && yPos <= 0.05 && yPos >= -0.122) {
                 gameState = GameState.PLAYING;
             } else if (xPos <= 0.05 && xPos >= -0.05 && yPos <= 0.05 && yPos >= -0.122) {
