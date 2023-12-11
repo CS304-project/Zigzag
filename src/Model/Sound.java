@@ -13,14 +13,15 @@ public class Sound {
         file = new File(path);
         audioStream = AudioSystem.getAudioInputStream(file);
         clip = AudioSystem.getClip();
+
         clip.open(audioStream);
     }
 
-    public void Start() {
+    public void start() {
         clip.start();
     }
 
-    public void Reset() {
+    public void reset() {
         clip.setMicrosecondPosition(0);
     }
 }

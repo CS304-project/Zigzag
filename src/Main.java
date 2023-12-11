@@ -26,12 +26,7 @@ public class Main extends JFrame {
             JLabel gameOverScoreP2Label = new JLabel("");
             JLabel highestScoreLabel = new JLabel("");
             JLabel winnerLabel = new JLabel("");
-            JLabel Count = new JLabel("");
             Font font = new Font("Myriad Arabic", Font.PLAIN, 24);
-
-
-
-            Count.setFont(font);
 
             counterLabelP1.setFont(font);
             counterLabelP1.setOpaque(true);
@@ -77,7 +72,6 @@ public class Main extends JFrame {
             listener.setScoreP2label(gameOverScoreP2Label);
             listener.setHighestScoreLabel(highestScoreLabel);
             listener.setWinnerLabel(winnerLabel);
-            listener.setCount(Count);
 
             glCanvas.addGLEventListener(listener);
             glCanvas.addMouseListener(listener);
@@ -92,7 +86,6 @@ public class Main extends JFrame {
             lp.add(gameOverScoreP2Label, 3);
             lp.add(winnerLabel, 4);
             lp.add(highestScoreLabel, 5);
-            lp.add(Count,6);
             lp.add(glCanvas, 7);
 
             add(lp, BorderLayout.CENTER);
