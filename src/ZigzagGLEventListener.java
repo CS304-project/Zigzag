@@ -283,9 +283,9 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         if (difficulty == GameDifficulty.EASY) {
             handleCubesAndBallsAnimation(gl, 0.002f);
         } else if (difficulty == GameDifficulty.MEDIUM) {
-            handleCubesAndBallsAnimation(gl, 0.003f);
-        } else if (difficulty == GameDifficulty.HARD) {
             handleCubesAndBallsAnimation(gl, 0.004f);
+        } else if (difficulty == GameDifficulty.HARD) {
+            handleCubesAndBallsAnimation(gl, 0.006f);
         }
 
         if (mode == GameMode.MULTIPLAYER) {
