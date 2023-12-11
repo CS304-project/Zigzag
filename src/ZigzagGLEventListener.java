@@ -21,9 +21,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Point2D;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Scanner;
+import java.util.*;
+import java.util.Timer;
 
 public class ZigzagGLEventListener implements GLEventListener, KeyListener, MouseListener {
     private final ArrayList<Cube> cubes = new ArrayList<>();
@@ -66,6 +65,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     private final BitSet keyBits = new BitSet(256);
     private boolean didBlackBallChangeDirection = false;
     private boolean didRedBallChangeDirection = false;
+    int counts = 3;
 
     public ZigzagGLEventListener() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
         blackBall = new Ball(
@@ -255,7 +255,6 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     }
 
     private void drawCountDownScreen(GL gl) {
-        System.out.println("hhhhhh");
         gl.glClear(GL.GL_COLOR_BUFFER_BIT);
         for (int i = cubes.size() - 1; i >= 0; i--) {
             Cube cube = cubes.get(i);
@@ -266,18 +265,20 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
 
 
     private void countDown() {
-        Count.setVisible(true);
-        Count.setBounds(640, 0, 100, 100);
-        try {
-            for (int i = 3; i > 0; i--) {
-                Count.setText("" + i);
-                Thread.sleep(1000);
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            int val = counts;
+
+            @Override
+            public void run() {
+                val--;
+
+                if (val < 0) {
+                    timer.cancel();
+                    gameState = GameState.PLAYING;
+                }
             }
-            gameState = GameState.PLAYING;
-        } catch (InterruptedException e) {
-            System.out.println("InterruptedException" + e.getMessage());
-        }
-        Count.setVisible(false);
+        }, 0, 1000);
     }
 
     private void drawPlayingScreen(GL gl) {
