@@ -1,6 +1,6 @@
 package Config;
 
-public enum Difficulty {
+public enum GameDifficulty {
     EASY,
     MEDIUM,
     HARD
