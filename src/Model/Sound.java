@@ -1,12 +1,13 @@
 package Model;
+
 import java.io.File;
 import java.io.IOException;
-import java.util.Scanner;
 import javax.sound.sampled.*;
+
 public class Sound {
-    File file ;
+    File file;
     AudioInputStream audioStream;
-    Clip clip ;
+    Clip clip;
 
     public Sound(String path) throws LineUnavailableException, UnsupportedAudioFileException, IOException {
         file = new File(path);
@@ -14,13 +15,12 @@ public class Sound {
         clip = AudioSystem.getClip();
         clip.open(audioStream);
     }
+
     public void Start() {
         clip.start();
     }
+
     public void Reset() {
         clip.setMicrosecondPosition(0);
-    }
-    public void Stop() {
-        clip.stop();
     }
 }

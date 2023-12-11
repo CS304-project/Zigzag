@@ -25,7 +25,7 @@ public class Ball {
         this.radius = (float) Math.sqrt((center.x - topRight.x) * (center.x - topRight.x));
     }
 
-    public void drawBall(GL gl, int texture) {
+    public void draw(GL gl, int texture) {
         gl.glColor3f(1, 1, 1);
         gl.glEnable(GL.GL_BLEND);
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture);
@@ -42,7 +42,7 @@ public class Ball {
         gl.glDisable(GL.GL_BLEND);
     }
 
-    public void navigateBall(float speed) {
+    public void navigate(float speed) {
         if (isMovingRight) {
             bottomLeft.x += speed;
             bottomRight.x += speed;
@@ -58,7 +58,7 @@ public class Ball {
         }
     }
 
-    public void navigateFallingBall() {
+    public void animateFalling() {
         if (isMovingRight && !xFlag) {
             bottomLeft.x += 0.002f;
             bottomRight.x += 0.002f;
