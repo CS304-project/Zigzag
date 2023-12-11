@@ -344,6 +344,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
                 drawGameOverMenuM(gl);
                 showMultiPlayerSummary();
             }
+            fallingSound.Reset();
         }
     }
 
@@ -378,7 +379,9 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
             Cube cube = cubes.get(i);
             cube.draw(gl, textures[1]);
         }
-
+        if(!isMuted){
+            fallingSound.Start();
+        }
         blackBall.animateFalling();
 
         if (blackBall.topLeft.y < -1) {
@@ -391,7 +394,9 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
             Cube cube = cubes.get(i);
             cube.draw(gl, textures[1]);
         }
-
+        if(!isMuted){
+            fallingSound.Start();
+        }
         redBall.animateFalling();
 
         if (redBall.topLeft.y < -1) {
@@ -522,14 +527,8 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         Cube lastCube = cubes.get(cubes.size() - 1);
 
         if (blackBall.isFalling) {
-            if(!isMuted){
-                fallingSound.Start();
-            }
             handleBlackBallFallingAnimation(gl);
         } else if (redBall != null && redBall.isFalling) {
-            if(!isMuted){
-                fallingSound.Start();
-            }
             handleRedBallFallingAnimation(gl);
         } else {
             handleGamePlayAnimation(gl, speed);
