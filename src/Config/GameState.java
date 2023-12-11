@@ -6,5 +6,6 @@ public enum GameState {
     CHOOSE_DIFFICULTY,
     PLAYING,
     PAUSED,
-    GAME_OVER
+    GAME_OVER,
+    COUNTDOWN
 }
