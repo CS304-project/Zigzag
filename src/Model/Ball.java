@@ -42,19 +42,19 @@ public class Ball {
         gl.glDisable(GL.GL_BLEND);
     }
 
-    public void navigateBall() {
+    public void navigateBall(float speed) {
         if (isMovingRight) {
-            bottomLeft.x += 0.001f;
-            bottomRight.x += 0.001f;
-            topLeft.x += 0.001f;
-            topRight.x += 0.001f;
-            center.x += 0.001f;
+            bottomLeft.x += speed;
+            bottomRight.x += speed;
+            topLeft.x += speed;
+            topRight.x += speed;
+            center.x += speed;
         } else {
-            bottomLeft.x -= 0.001f;
-            bottomRight.x -= 0.001f;
-            topLeft.x -= 0.001f;
-            topRight.x -= 0.001f;
-            center.x -= 0.001f;
+            bottomLeft.x -= speed;
+            bottomRight.x -= speed;
+            topLeft.x -= speed;
+            topRight.x -= speed;
+            center.x -= speed;
         }
     }
 
@@ -76,10 +76,10 @@ public class Ball {
         }
         if (xCounter > 50) xFlag = true;
         if (xFlag) {
-            bottomLeft.y -= 0.002f;
-            bottomRight.y -= 0.002f;
-            topLeft.y -= 0.002f;
-            topRight.y -= 0.002f;
+            bottomLeft.y -= 0.006f;
+            bottomRight.y -= 0.006f;
+            topLeft.y -= 0.006f;
+            topRight.y -= 0.006f;
         }
     }
 }
