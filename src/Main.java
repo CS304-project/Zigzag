@@ -14,7 +14,7 @@ public class Main extends JFrame {
         try {
             GLCanvas glCanvas = new GLCanvas();
             ZigzagGLEventListener listener = new ZigzagGLEventListener();
-            FPSAnimator animator = new FPSAnimator(glCanvas, 265);
+            FPSAnimator animator = new FPSAnimator(glCanvas, 100);
             JLabel counterLabelP1 = new JLabel();
             JLabel counterLabelP2 = new JLabel();
             JLayeredPane lp = new JLayeredPane();
@@ -86,7 +86,7 @@ public class Main extends JFrame {
             lp.add(gameOverScoreP2Label, 3);
             lp.add(winnerLabel, 4);
             lp.add(highestScoreLabel, 5);
-            lp.add(glCanvas, 6);
+            lp.add(glCanvas, 7);
 
             add(lp, BorderLayout.CENTER);
             setLocationRelativeTo(this);

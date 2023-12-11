@@ -21,9 +21,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Point2D;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Scanner;
+import java.util.*;
+import java.util.Timer;
 
 public class ZigzagGLEventListener implements GLEventListener, KeyListener, MouseListener {
     private final ArrayList<Cube> cubes = new ArrayList<>();
@@ -65,6 +64,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     private final BitSet keyBits = new BitSet(256);
     private boolean didBlackBallChangeDirection = false;
     private boolean didRedBallChangeDirection = false;
+    int countdownVal = 3;
 
     public ZigzagGLEventListener() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
         blackBall = new Ball(
@@ -249,6 +249,33 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         drawDifficultyMenu(gl);
     }
 
+    private void drawCountDownScreen(GL gl) {
+        gl.glClear(GL.GL_COLOR_BUFFER_BIT);
+        for (int i = cubes.size() - 1; i >= 0; i--) {
+            Cube cube = cubes.get(i);
+            cube.draw(gl, textures[1]);
+        }
+        blackBall.draw(gl, textures[0]);
+    }
+
+
+    private void countDown() {
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            int val = countdownVal;
+
+            @Override
+            public void run() {
+                val--;
+
+                if (val < 0) {
+                    timer.cancel();
+                    gameState = GameState.PLAYING;
+                }
+            }
+        }, 0, 1000);
+    }
+
     private void drawPlayingScreen(GL gl) {
         gl.glClear(GL.GL_COLOR_BUFFER_BIT);
         scorePanelP1.setVisible(true);
@@ -269,7 +296,6 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     private void handleScoreFileUpdating() {
         if (scoreP1 > Integer.parseInt(highestScore)) {
             highestScore = scoreP1.toString();
-
             updateScoreFile();
         }
     }
@@ -330,6 +356,9 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
             drawChooseModeScreen(gl);
         } else if (gameState == GameState.CHOOSE_DIFFICULTY) {
             drawChooseDifficultyScreen(gl);
+        } else if (gameState == GameState.COUNTDOWN) {
+            drawCountDownScreen(gl);
+            countDown();
         } else if (gameState == GameState.PLAYING) {
             drawPlayingScreen(gl);
         } else if (gameState == GameState.PAUSED) {
@@ -344,7 +373,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
                 drawGameOverMenuM(gl);
                 showMultiPlayerSummary();
             }
-            fallingSound.Reset();
+            fallingSound.reset();
         }
     }
 
@@ -379,9 +408,10 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
             Cube cube = cubes.get(i);
             cube.draw(gl, textures[1]);
         }
-        if(!isMuted){
-            fallingSound.Start();
+        if (!isMuted) {
+            fallingSound.start();
         }
+
         blackBall.animateFalling();
 
         if (blackBall.topLeft.y < -1) {
@@ -394,9 +424,10 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
             Cube cube = cubes.get(i);
             cube.draw(gl, textures[1]);
         }
-        if(!isMuted){
-            fallingSound.Start();
+        if (!isMuted) {
+            fallingSound.start();
         }
+
         redBall.animateFalling();
 
         if (redBall.topLeft.y < -1) {
@@ -423,7 +454,9 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
                     cube.diamond.animate(speed);
             }
         }
+
         blackBall.navigate(speed);
+
         if (redBall != null) redBall.navigate(speed);
     }
 
@@ -461,10 +494,12 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
             if (distance <= (blackBall.radius + intersectedCube.diamond.radius)) {
                 intersectedCube.diamond = null;
                 scoreP1 += 2;
+
                 if (!isMuted) {
-                    collectingDiamondsSound.Reset();
-                    collectingDiamondsSound.Start();
+                    collectingDiamondsSound.reset();
+                    collectingDiamondsSound.start();
                 }
+
                 counterLabelP1.setText(scoreP1.toString());
             }
         }
@@ -483,7 +518,6 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         } else if (!intersectedCubeWithBlack.hasBeenPassed) {
             scoreP1++;
             scoreP2++;
-
             intersectedCubeWithBlack.hasBeenPassed = true;
 
             counterLabelP1.setText(scoreP1.toString());
@@ -506,17 +540,21 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
 
                 if (distanceP1 < distanceP2) {
                     scoreP1 += 2;
+
                     if (!isMuted) {
-                        collectingDiamondsSound.Reset();
-                        collectingDiamondsSound.Start();
+                        collectingDiamondsSound.reset();
+                        collectingDiamondsSound.start();
                     }
+
                     counterLabelP1.setText(scoreP1.toString());
                 } else {
                     scoreP2 += 2;
+
                     if (!isMuted) {
-                        collectingDiamondsSound.Reset();
-                        collectingDiamondsSound.Start();
+                        collectingDiamondsSound.reset();
+                        collectingDiamondsSound.start();
                     }
+
                     counterLabelP2.setText(scoreP2.toString());
                 }
             }
@@ -562,6 +600,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         } else {
             titleYPos -= 0.0005f;
         }
+
         if (titleYPos > 0.05) isTitleGoingUp = false;
         else if (titleYPos < -0.05) isTitleGoingUp = true;
     }
@@ -814,45 +853,51 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
 
     private void handleMouseClicksInWelcomeScreen(float xPos, float yPos) {
         if (xPos <= -0.04 && xPos >= -0.108 && yPos <= -0.110 && yPos >= -0.187 && !isInfoMenuOpen) {
-            if(isMuted){
-                clickSound.Reset();
-                clickSound.Start();
+            if (isMuted) {
+                clickSound.reset();
+                clickSound.start();
             }
+
             isMuted = !isMuted;
         } else if (xPos <= 0.108 && xPos >= 0.041 && yPos <= -0.110 && yPos >= -0.187 && !isInfoMenuOpen) {
-            if(!isMuted){
-                clickSound.Reset();
-                clickSound.Start();
+            if (!isMuted) {
+                clickSound.reset();
+                clickSound.start();
             }
+
             isInfoMenuOpen = true;
         } else if (isInfoMenuOpen && xPos <= 0.08 && xPos >= -0.08 && yPos <= -0.232 && yPos >= -0.354) {
-            if(!isMuted){
-                clickSound.Reset();
-                clickSound.Start();
+            if (!isMuted) {
+                clickSound.reset();
+                clickSound.start();
             }
+
             isInfoMenuOpen = false;
         } else if (!isInfoMenuOpen) {
-            if(!isMuted){
-                clickSound.Reset();
-                clickSound.Start();
+            if (!isMuted) {
+                clickSound.reset();
+                clickSound.start();
             }
+
             gameState = GameState.CHOOSE_MODE;
         }
     }
 
     private void handleMouseClicksInChooseModeScreen(float xPos, float yPos) {
         if (xPos <= 0.391 && xPos >= 0.091 && yPos <= 0.06 && yPos >= -0.132) {
-            if(!isMuted){
-                clickSound.Reset();
-                clickSound.Start();
+            if (!isMuted) {
+                clickSound.reset();
+                clickSound.start();
             }
+
             mode = GameMode.SINGLE_PLAYER;
             gameState = GameState.CHOOSE_DIFFICULTY;
         } else if (xPos <= -0.091 && xPos >= -0.391 && yPos <= 0.06 && yPos >= -0.132) {
-            if(!isMuted){
-                clickSound.Reset();
-                clickSound.Start();
+            if (!isMuted) {
+                clickSound.reset();
+                clickSound.start();
             }
+
             redBall = new Ball(
                     new Point2D.Float(-0.05f, -0.025f),
                     new Point2D.Float(0, -0.025f),
@@ -866,57 +911,64 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
 
     private void handleMouseClicksInChooseDifficultyScreen(float xPos, float yPos) {
         if (xPos <= 0.102 && xPos >= -0.097 && yPos <= 0.243 && yPos >= 0.130) {
-            if(!isMuted){
-                clickSound.Reset();
-                clickSound.Start();
+            if (!isMuted) {
+                clickSound.reset();
+                clickSound.start();
             }
+
             difficulty = GameDifficulty.EASY;
-            gameState = GameState.PLAYING;
+            gameState = GameState.COUNTDOWN;
         } else if (xPos <= 0.102 && xPos >= -0.097 && yPos <= 0.057 && yPos >= -0.057) {
-            if(!isMuted){
-                clickSound.Reset();
-                clickSound.Start();
+            if (!isMuted) {
+                clickSound.reset();
+                clickSound.start();
             }
+
             difficulty = GameDifficulty.MEDIUM;
-            gameState = GameState.PLAYING;
+            gameState = GameState.COUNTDOWN;
         } else if (xPos <= 0.102 && xPos >= -0.097 && yPos <= -0.131 && yPos >= -0.241) {
-            if(!isMuted){
-                clickSound.Reset();
-                clickSound.Start();
+            if (!isMuted) {
+                clickSound.reset();
+                clickSound.start();
             }
+
             difficulty = GameDifficulty.HARD;
-            gameState = GameState.PLAYING;
+            gameState = GameState.COUNTDOWN;
         }
     }
 
     private void handleMouseClicksInPauseModal(float xPos, float yPos) {
         if (xPos <= 0.22 && xPos >= 0.111 && yPos <= 0.05 && yPos >= -0.122) {
-            if(!isMuted){
-                clickSound.Reset();
-                clickSound.Start();
+            if (!isMuted) {
+                clickSound.reset();
+                clickSound.start();
             }
+
             gameState = GameState.PLAYING;
         } else if (xPos <= 0.05 && xPos >= -0.05 && yPos <= 0.05 && yPos >= -0.122) {
-            if(!isMuted){
-                clickSound.Reset();
-                clickSound.Start();
+            if (!isMuted) {
+                clickSound.reset();
+                clickSound.start();
             }
+
             reset();
         } else if (xPos <= -0.111 && xPos >= -0.22 && yPos <= 0.05 && yPos >= -0.122) {
-            if(isMuted){
-                clickSound.Reset();
-                clickSound.Start();
+            if (isMuted) {
+                clickSound.reset();
+                clickSound.start();
             }
+
             isMuted = !isMuted;
         }
     }
 
     private void handleMouseClicksInLoseModal(float xPos, float yPos) {
         if (xPos <= 0.079 && xPos >= -0.076 && yPos <= -0.094 && yPos >= -0.194) {
-            if(!isMuted){
-                clickSound.Reset();
-                clickSound.Start();
+            if (!isMuted) {
+                clickSound.reset();
+                clickSound.start();
             }
+
             reset();
             animator.start();
         }
@@ -928,9 +980,10 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
                 didBlackBallChangeDirection = true;
 
                 if (!isMuted) {
-                    movingSound.Reset();
-                    movingSound.Start();
+                    movingSound.reset();
+                    movingSound.start();
                 }
+
                 blackBall.isMovingRight = !blackBall.isMovingRight;
             }
 
@@ -938,9 +991,10 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
                 didRedBallChangeDirection = true;
 
                 if (!isMuted) {
-                    movingSound.Reset();
-                    movingSound.Start();
+                    movingSound.reset();
+                    movingSound.start();
                 }
+
                 if (redBall != null) {
                     redBall.isMovingRight = !redBall.isMovingRight;
                 }
