@@ -37,11 +37,19 @@ public class Diamond {
         gl.glDisable(GL.GL_BLEND);
     }
 
-    public void animateDiamond() {
-        bottomLeft.y -= 0.001f;
-        topLeft.y -= 0.001f;
-        bottomRight.y -= 0.001f;
-        topRight.y -= 0.001f;
-        center.y -=0.001f;
+    public void animateDiamond(float speed) {
+        bottomLeft.y -= speed;
+        topLeft.y -= speed;
+        bottomRight.y -= speed;
+        topRight.y -= speed;
+        center.y -=speed;
+    }
+
+    public void animateFallingDiamond(float speed) {
+        bottomLeft.y -= speed + 0.002f;
+        topLeft.y -= speed + 0.002f;
+        bottomRight.y -= speed + 0.002f;
+        topRight.y -= speed + 0.002f;
+        center.y -=speed + 0.002f;
     }
 }
