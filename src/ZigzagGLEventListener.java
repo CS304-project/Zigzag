@@ -59,6 +59,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     private final Sound clickSound;
     private final Sound movingSound;
     private final Sound collectingDiamondsSound;
+    private final Sound fallingSound;
     private final TextureReader.Texture[] texture = new TextureReader.Texture[textureNames.length];
     private final int[] textures = new int[textureNames.length];
     private final BitSet keyBits = new BitSet(256);
@@ -76,6 +77,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         clickSound = new Sound("assets/Sounds/start.wav");
         movingSound = new Sound("assets/Sounds/moving.wav");
         collectingDiamondsSound = new Sound("assets/Sounds/eat_diamond.wav");
+        fallingSound = new Sound("assets/Sounds/falling.wav");
         highestScore = "0";
         File file = new File("C://3JKM");
 
@@ -334,7 +336,6 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
             drawPauseMenu(gl);
         } else if (gameState == GameState.GAME_OVER && animator.isAnimating()) {
             animator.stop();
-
             if (mode == GameMode.SINGLE_PLAYER) {
                 handleScoreFileUpdating();
                 drawGameOverMenuS(gl);
@@ -343,6 +344,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
                 drawGameOverMenuM(gl);
                 showMultiPlayerSummary();
             }
+            fallingSound.Reset();
         }
     }
 
@@ -377,7 +379,9 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
             Cube cube = cubes.get(i);
             cube.draw(gl, textures[1]);
         }
-
+        if(!isMuted){
+            fallingSound.Start();
+        }
         blackBall.animateFalling();
 
         if (blackBall.topLeft.y < -1) {
@@ -390,7 +394,9 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
             Cube cube = cubes.get(i);
             cube.draw(gl, textures[1]);
         }
-
+        if(!isMuted){
+            fallingSound.Start();
+        }
         redBall.animateFalling();
 
         if (redBall.topLeft.y < -1) {
@@ -808,21 +814,45 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
 
     private void handleMouseClicksInWelcomeScreen(float xPos, float yPos) {
         if (xPos <= -0.04 && xPos >= -0.108 && yPos <= -0.110 && yPos >= -0.187 && !isInfoMenuOpen) {
+            if(isMuted){
+                clickSound.Reset();
+                clickSound.Start();
+            }
             isMuted = !isMuted;
         } else if (xPos <= 0.108 && xPos >= 0.041 && yPos <= -0.110 && yPos >= -0.187 && !isInfoMenuOpen) {
+            if(!isMuted){
+                clickSound.Reset();
+                clickSound.Start();
+            }
             isInfoMenuOpen = true;
         } else if (isInfoMenuOpen && xPos <= 0.08 && xPos >= -0.08 && yPos <= -0.232 && yPos >= -0.354) {
+            if(!isMuted){
+                clickSound.Reset();
+                clickSound.Start();
+            }
             isInfoMenuOpen = false;
         } else if (!isInfoMenuOpen) {
+            if(!isMuted){
+                clickSound.Reset();
+                clickSound.Start();
+            }
             gameState = GameState.CHOOSE_MODE;
         }
     }
 
     private void handleMouseClicksInChooseModeScreen(float xPos, float yPos) {
         if (xPos <= 0.391 && xPos >= 0.091 && yPos <= 0.06 && yPos >= -0.132) {
+            if(!isMuted){
+                clickSound.Reset();
+                clickSound.Start();
+            }
             mode = GameMode.SINGLE_PLAYER;
             gameState = GameState.CHOOSE_DIFFICULTY;
         } else if (xPos <= -0.091 && xPos >= -0.391 && yPos <= 0.06 && yPos >= -0.132) {
+            if(!isMuted){
+                clickSound.Reset();
+                clickSound.Start();
+            }
             redBall = new Ball(
                     new Point2D.Float(-0.05f, -0.025f),
                     new Point2D.Float(0, -0.025f),
@@ -836,12 +866,24 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
 
     private void handleMouseClicksInChooseDifficultyScreen(float xPos, float yPos) {
         if (xPos <= 0.102 && xPos >= -0.097 && yPos <= 0.243 && yPos >= 0.130) {
+            if(!isMuted){
+                clickSound.Reset();
+                clickSound.Start();
+            }
             difficulty = GameDifficulty.EASY;
             gameState = GameState.PLAYING;
         } else if (xPos <= 0.102 && xPos >= -0.097 && yPos <= 0.057 && yPos >= -0.057) {
+            if(!isMuted){
+                clickSound.Reset();
+                clickSound.Start();
+            }
             difficulty = GameDifficulty.MEDIUM;
             gameState = GameState.PLAYING;
         } else if (xPos <= 0.102 && xPos >= -0.097 && yPos <= -0.131 && yPos >= -0.241) {
+            if(!isMuted){
+                clickSound.Reset();
+                clickSound.Start();
+            }
             difficulty = GameDifficulty.HARD;
             gameState = GameState.PLAYING;
         }
@@ -849,16 +891,32 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
 
     private void handleMouseClicksInPauseModal(float xPos, float yPos) {
         if (xPos <= 0.22 && xPos >= 0.111 && yPos <= 0.05 && yPos >= -0.122) {
+            if(!isMuted){
+                clickSound.Reset();
+                clickSound.Start();
+            }
             gameState = GameState.PLAYING;
         } else if (xPos <= 0.05 && xPos >= -0.05 && yPos <= 0.05 && yPos >= -0.122) {
+            if(!isMuted){
+                clickSound.Reset();
+                clickSound.Start();
+            }
             reset();
         } else if (xPos <= -0.111 && xPos >= -0.22 && yPos <= 0.05 && yPos >= -0.122) {
+            if(isMuted){
+                clickSound.Reset();
+                clickSound.Start();
+            }
             isMuted = !isMuted;
         }
     }
 
     private void handleMouseClicksInLoseModal(float xPos, float yPos) {
         if (xPos <= 0.079 && xPos >= -0.076 && yPos <= -0.094 && yPos >= -0.194) {
+            if(!isMuted){
+                clickSound.Reset();
+                clickSound.Start();
+            }
             reset();
             animator.start();
         }
