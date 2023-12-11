@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 
-public class Main extends JFrame  {
+public class Main extends JFrame {
     public Main() {
         super("Zigzag");
 
@@ -17,44 +17,78 @@ public class Main extends JFrame  {
             FPSAnimator animator = new FPSAnimator(glCanvas, 265);
             JLabel counterLabelP1 = new JLabel();
             JLabel counterLabelP2 = new JLabel();
-
-            counterLabelP1.setFont(new Font("Myriad Arabic", Font.PLAIN, 24));
-            counterLabelP2.setFont(new Font("Myriad Arabic", Font.PLAIN, 24));
-
-            JLabel scoreLabelP1 = new JLabel("score: ");
-            JLabel scoreLabelP2 = new JLabel("score: ");
-
-            scoreLabelP1.setFont(new Font("Myriad Arabic", Font.PLAIN, 24));
-            scoreLabelP2.setFont(new Font("Myriad Arabic", Font.PLAIN, 24));
-
+            JLayeredPane lp = new JLayeredPane();
             JPanel jPanelP1 = new JPanel();
             JPanel jPanelP2 = new JPanel();
+            JLabel scoreLabelP1 = new JLabel("score: ");
+            JLabel scoreLabelP2 = new JLabel("score: ");
+            JLabel gameOverScoreP1Label = new JLabel("");
+            JLabel gameOverScoreP2Label = new JLabel("");
+            JLabel highestScoreLabel = new JLabel("");
+            JLabel winnerLabel = new JLabel("");
+            Font font = new Font("Myriad Arabic", Font.PLAIN, 24);
+
+            counterLabelP1.setFont(font);
+            counterLabelP1.setOpaque(true);
+            counterLabelP1.setBackground(Color.white);
+
+            counterLabelP2.setFont(font);
+            counterLabelP2.setForeground(Color.RED);
+
+            scoreLabelP1.setFont(font);
+            scoreLabelP1.setBackground(Color.WHITE);
+
+            scoreLabelP2.setFont(font);
+            scoreLabelP2.setForeground(Color.RED);
+
+            gameOverScoreP1Label.setFont(font);
+
+            gameOverScoreP2Label.setFont(font);
+
+            highestScoreLabel.setFont(font);
+
+            winnerLabel.setFont(font);
 
             jPanelP1.add(scoreLabelP1);
             jPanelP1.add(counterLabelP1);
-            jPanelP1.setBackground(Color.white);
+            jPanelP1.setBounds(1080, 0, 150, 40);
+            jPanelP1.setOpaque(true);
+            jPanelP1.setBackground(new Color(255, 255, 255));
             jPanelP1.setVisible(false);
 
             jPanelP2.add(scoreLabelP2);
             jPanelP2.add(counterLabelP2);
-            jPanelP2.setBackground(Color.white);
+            jPanelP2.setBounds(0, 0, 150, 40);
+            jPanelP2.setOpaque(true);
+            jPanelP2.setBackground(new Color(255, 255, 255));
             jPanelP2.setVisible(false);
 
             listener.setScorePanelP1(jPanelP1);
             listener.setScorePanelP2(jPanelP2);
             listener.setCounterLabelP1(counterLabelP1);
             listener.setCounterLabelP2(counterLabelP2);
-            listener.setGLCanvas(glCanvas);
             listener.setAnimator(animator);
+            listener.setScoreP1label(gameOverScoreP1Label);
+            listener.setScoreP2label(gameOverScoreP2Label);
+            listener.setHighestScoreLabel(highestScoreLabel);
+            listener.setWinnerLabel(winnerLabel);
 
             glCanvas.addGLEventListener(listener);
             glCanvas.addMouseListener(listener);
             glCanvas.addKeyListener(listener);
+            glCanvas.setBounds(0, 0, 1280, 800);
             glCanvas.setFocusable(true);
 
-            add(glCanvas);
-            add(jPanelP1, BorderLayout.EAST);
-            add(jPanelP2, BorderLayout.WEST);
+            lp.setPreferredSize(new Dimension(1280, 800));
+            lp.add(jPanelP1, 0);
+            lp.add(jPanelP2, 1);
+            lp.add(gameOverScoreP1Label, 2);
+            lp.add(gameOverScoreP2Label, 3);
+            lp.add(winnerLabel, 4);
+            lp.add(highestScoreLabel, 5);
+            lp.add(glCanvas, 6);
+
+            add(lp, BorderLayout.CENTER);
             setLocationRelativeTo(this);
             setDefaultCloseOperation(EXIT_ON_CLOSE);
             setSize(1280, 800);
@@ -62,11 +96,11 @@ public class Main extends JFrame  {
             setVisible(true);
             animator.start();
         } catch (LineUnavailableException e) {
-            System.out.println("LineUnavailableException : " + e.getMessage());
-        }catch (UnsupportedAudioFileException e) {
-            System.out.println("UnsupportedAudioFileException : " + e.getMessage());
-        }catch (IOException e) {
-            System.out.println("IOException : " + e.getMessage());
+            System.out.println("LineUnavailableException: " + e.getMessage());
+        } catch (UnsupportedAudioFileException e) {
+            System.out.println("UnsupportedAudioFileException: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("IOException: " + e.getMessage());
         }
     }
 
