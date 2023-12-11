@@ -2,6 +2,7 @@ import Config.GameState;
 import Config.GameMode;
 import Model.Ball;
 import Model.Cube;
+import Model.Sound;
 import Texture.TextureReader;
 import com.sun.opengl.util.FPSAnimator;
 
@@ -10,6 +11,8 @@ import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -17,8 +20,9 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Point2D;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class ZigzagGLEventListener implements GLEventListener, KeyListener, MouseListener {
     GLCanvas glCanvas;
@@ -28,10 +32,16 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     private FPSAnimator animator;
     public JLabel counterLabelP1;
     private JLabel counterLabelP2;
+    private JLabel scoreP1label;
+    private JLabel scoreP2label;
+    private JLabel highestScoreLabel;
+    private JLabel winnerLabel;
     private JPanel scorePanelP1;
     private JPanel scorePanelP2;
+    private final File txtFile;
     Integer scoreP1 = -1;
     Integer scoreP2 = -1;
+    String  highestScore ;
     float y = 0;
     boolean isGoingUp = true;
     GameState gameState = GameState.WELCOME;
@@ -41,8 +51,11 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
             "Ball//ball.png", "Diamond//WithShadow//Diamond_with_shadow.png", "Home//Info.png", "Pause//Play_button.png",
             "Home//sound_On.png", "Home//TapToPlay.png", "Home//title.png", "EndGame//GameOver.png", "Ball//ball2.png",
             "Pause//Background.png", "Pause//home.png", "GameMode//multiPlayer.png", "GameMode//singlePlayer.png",
-            "Home//sound_Off.png"
+            "Home//sound_Off.png", "EndGame//GameOverM.png"
     };
+    private final Sound Tap;
+    private final Sound Moving;
+    private final Sound Eating;
     private final TextureReader.Texture[] texture = new TextureReader.Texture[textureNames.length];
     private final int[] textures = new int[textureNames.length];
 
@@ -62,7 +75,23 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         this.scorePanelP2 = scorePanel;
     }
 
-    public ZigzagGLEventListener() {
+    public void setScoreP1label(JLabel scoreP1) {
+        this.scoreP1label = scoreP1;
+    }
+
+    public void setScoreP2label(JLabel scoreP2) {
+        this.scoreP2label = scoreP2;
+    }
+
+    public void setWinnerLabel(JLabel winner) {
+        this.winnerLabel = winner;
+    }
+
+    public void setHighestScoreLabel(JLabel highestScore) {
+        this.highestScoreLabel = highestScore;
+    }
+
+    public ZigzagGLEventListener() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
         ball1 = new Ball(
                 new Point2D.Float(-0.025f, -0.025f),
                 new Point2D.Float(0.025f, -0.025f),
@@ -70,6 +99,32 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
                 new Point2D.Float(-0.025f, 0.025f)
         );
         mode = GameMode.SINGLE_PLAYER;
+        Tap = new Sound("assets/Sounds/start.wav");
+        Moving = new Sound("assets/Sounds/moving.wav");
+        Eating = new Sound("assets/Sounds/eat_diamond.wav");
+        highestScore = "0";
+        File file = new File("C://3JKM");
+
+        if (file.isDirectory()) {
+            txtFile = new File(file.getAbsolutePath() + "//score.txt");
+            if (txtFile.isFile()) {
+                BufferedReader br = new BufferedReader(new FileReader(txtFile.getAbsoluteFile()));
+
+                if (br.readLine() != null) {
+                    Scanner in = new Scanner(txtFile);
+                    highestScore = in.nextLine();
+                }
+            }
+        } else {
+            boolean isDirCreated = file.mkdir();
+
+            if (isDirCreated) {
+                txtFile = new File(file.getAbsolutePath() + "//score.txt");
+                boolean isFile = txtFile.createNewFile();
+            } else {
+                txtFile = null;
+            }
+        }
 
         initCubes();
     }
@@ -156,14 +211,13 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
             animateTitle();
             scorePanelP1.setVisible(false);
             scorePanelP2.setVisible(false);
-
             for (int i = cubes.size() - 1; i >= 0; i--) {
                 Cube cube = cubes.get(i);
 
                 cube.drawCube(gl, textures[1]);
             }
             ball1.drawBall(gl, textures[0]);
-            if (isMuted){
+            if (isMuted) {
                 drawSoundIcon(gl, textures[13]);
             } else {
                 drawSoundIcon(gl, textures[4]);
@@ -186,21 +240,48 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
             multiPlayerBTN(gl);
             singlePlayerBTN(gl);
         } else if (gameState == GameState.PLAYING) {
+            if (!isMuted) Tap.Start();
             gl.glClear(GL.GL_COLOR_BUFFER_BIT);
             scorePanelP1.setVisible(true);
             drawingAnimatingCubes(gl);
-
             if (mode == GameMode.MULTIPLAYER) {
                 scorePanelP2.setVisible(true);
             }
         } else if (gameState == GameState.PAUSED) {
             drawPauseMenu(gl);
+        } else if (gameState == GameState.GAME_OVER && animator.isAnimating()) {
+            animator.stop();
+            if (mode == GameMode.SINGLE_PLAYER) {
+                if (scoreP1 > Integer.parseInt(highestScore)) {
+                    highestScore = scoreP1.toString();
+
+                    updateScore();
+                }
+                drawGameOverMenuS(gl);
+                scoreP1label.setBounds(700, 306, 50, 50);
+                scoreP1label.setText(scoreP1.toString());
+                highestScoreLabel.setBounds(750,360,50,50);
+                highestScoreLabel.setText(highestScore);
+                scoreP1label.setVisible(true);
+                highestScoreLabel.setVisible(true);
+            } else {
+                drawGameOverMenuM(gl);
+                scoreP1label.setBounds(670, 280, 50, 50);
+                scoreP1label.setText(scoreP1.toString());
+                scoreP2label.setBounds(670, 335, 50, 50);
+                scoreP2label.setText(scoreP2.toString());
+                winnerLabel.setBounds(720,402,50,50);
+                winnerLabel.setText(ball2.isFalling ? "Black" : ball1.isFalling ? "Red" : "Draw");
+                scoreP1label.setVisible(true);
+                scoreP2label.setVisible(true);
+                winnerLabel.setVisible(true);
+            }
         }
     }
 
     public void drawPauseMenu(GL gl) {
         drawPauseMenuBG(gl);
-        if (isMuted){
+        if (isMuted) {
             PauseMenuSound(gl, textures[13]);
         } else {
             PauseMenuSound(gl, textures[4]);
@@ -209,28 +290,61 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         PauseMenuResume(gl);
     }
 
+    private void updateScore() {
+        try {
+            if (txtFile != null) {
+                PrintWriter out = new PrintWriter(txtFile.getAbsoluteFile());
+                out.println(scoreP1);
+                out.close();
+            }
+        } catch (IOException e) {
+            System.out.println("IOException: " + e.getMessage());
+        }
+    }
+
     public void drawingAnimatingCubes(GL gl) {
         Cube lastCube = cubes.get(cubes.size() - 1);
 
-        for (int i = cubes.size() - 1; i >= 0; i--) {
-            Cube cube = cubes.get(i);
-
-            if (cube.centralMid.y <= -0.6) {
-                cube.animateFallingCube(gl, textures[1]);
-                if (cube.topMid.y <= -1) {
-                    cubes.remove(i);
-                }
-            } else {
+        if (ball1.isFalling) {
+            for (int i = cubes.size() - 1; i >= 0; i--) {
+                Cube cube = cubes.get(i);
                 cube.drawCube(gl, textures[1]);
-                cube.animateCube();
-                if (cube.diamond != null)
-                    cube.diamond.animateDiamond();
             }
+            ball1.navigateFallingBall();
+            if (ball1.topLeft.y < -1) {
+                gameState = GameState.GAME_OVER;
+            }
+        } else if (ball2 != null && ball2.isFalling) {
+            for (int i = cubes.size() - 1; i >= 0; i--) {
+                Cube cube = cubes.get(i);
+                cube.drawCube(gl, textures[1]);
+            }
+            ball2.navigateFallingBall();
+            if (ball2.topLeft.y < -1) {
+                gameState = GameState.GAME_OVER;
+            }
+        } else {
+            for (int i = cubes.size() - 1; i >= 0; i--) {
+                Cube cube = cubes.get(i);
+
+                if (cube.centralMid.y <= -0.6) {
+                    cube.animateFallingCube(gl, textures[1]);
+                    if (cube.topMid.y <= -1) {
+                        cubes.remove(i);
+                    }
+                } else {
+                    cube.drawCube(gl, textures[1]);
+                    cube.animateCube();
+                    if (cube.diamond != null)
+                        cube.diamond.animateDiamond();
+                }
+            }
+            ball1.navigateBall();
+            if (ball2 != null) ball2.navigateBall();
         }
 
         if (mode == GameMode.SINGLE_PLAYER) {
             Cube intersectedCube = null;
-
             for (Cube cube : cubes) {
                 if (cube.isInside(ball1.center)) {
                     intersectedCube = cube;
@@ -241,9 +355,9 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
                 }
             }
 
-            if (intersectedCube == null && animator.isAnimating()) {
-                animator.stop();
-            } else if (intersectedCube != null && !intersectedCube.hasBeenPassed) {
+            if (intersectedCube == null) {
+                ball1.isFalling = true;
+            } else if (!intersectedCube.hasBeenPassed) {
                 scoreP1++;
                 counterLabelP1.setText(scoreP1.toString());
                 intersectedCube.hasBeenPassed = true;
@@ -254,6 +368,10 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
                 if (distance <= (ball1.radius + intersectedCube.diamond.radius)) {
                     intersectedCube.diamond = null;
                     scoreP1 += 2;
+                    if (!isMuted) {
+                        Eating.Reset();
+                        Eating.Start();
+                    }
                     counterLabelP1.setText(scoreP1.toString());
                 }
             }
@@ -281,11 +399,16 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
                 }
             }
 
-            if ((intersectedCube1 == null || intersectedCube2 == null) && animator.isAnimating()) {
-                animator.stop();
-            } else if (intersectedCube1 != null && !intersectedCube1.hasBeenPassed) {
+            if ((intersectedCube1 == null || intersectedCube2 == null)) {
+                if (intersectedCube1 == null) {
+                    ball1.isFalling = true;
+                } else {
+                    ball2.isFalling = true;
+                }
+            } else if (!intersectedCube1.hasBeenPassed) {
                 scoreP1++;
                 scoreP2++;
+
                 intersectedCube1.hasBeenPassed = true;
 
                 counterLabelP1.setText(scoreP1.toString());
@@ -308,9 +431,17 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
 
                     if (distanceP1 < distanceP2) {
                         scoreP1 += 2;
+                        if (!isMuted) {
+                            Eating.Reset();
+                            Eating.Start();
+                        }
                         counterLabelP1.setText(scoreP1.toString());
                     } else {
                         scoreP2 += 2;
+                        if (!isMuted) {
+                            Eating.Reset();
+                            Eating.Start();
+                        }
                         counterLabelP2.setText(scoreP2.toString());
                     }
                 }
@@ -323,11 +454,9 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         }
 
         ball1.drawBall(gl, textures[0]);
-        ball1.navigateBall();
 
         if (ball2 != null) {
             ball2.drawBall(gl, textures[8]);
-            ball2.navigateBall();
         }
     }
 
@@ -469,6 +598,38 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         gl.glDisable(GL.GL_BLEND);
     }
 
+    public void drawGameOverMenuS(GL gl) {
+        gl.glEnable(gl.GL_BLEND);
+        gl.glBindTexture(GL.GL_TEXTURE_2D, textures[7]);
+        gl.glBegin(gl.GL_QUADS);
+        gl.glTexCoord2f(0, 0);
+        gl.glVertex2d(-0.4, -0.7);
+        gl.glTexCoord2f(1, 0);
+        gl.glVertex2d(0.4, -0.7);
+        gl.glTexCoord2f(1, 1);
+        gl.glVertex2d(0.4, 0.7);
+        gl.glTexCoord2f(0, 1);
+        gl.glVertex2d(-0.4, 0.7);
+        gl.glEnd();
+        gl.glDisable(GL.GL_BLEND);
+    }
+
+    public void drawGameOverMenuM(GL gl) {
+        gl.glEnable(gl.GL_BLEND);
+        gl.glBindTexture(GL.GL_TEXTURE_2D, textures[14]);
+        gl.glBegin(gl.GL_QUADS);
+        gl.glTexCoord2f(0, 0);
+        gl.glVertex2d(-0.4, -0.7);
+        gl.glTexCoord2f(1, 0);
+        gl.glVertex2d(0.4, -0.7);
+        gl.glTexCoord2f(1, 1);
+        gl.glVertex2d(0.4, 0.7);
+        gl.glTexCoord2f(0, 1);
+        gl.glVertex2d(-0.4, 0.7);
+        gl.glEnd();
+        gl.glDisable(GL.GL_BLEND);
+    }
+
     public void multiPlayerBTN(GL gl) {
         gl.glEnable(gl.GL_BLEND);
         gl.glBindTexture(GL.GL_TEXTURE_2D, textures[11]);
@@ -501,6 +662,28 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         gl.glDisable(GL.GL_BLEND);
     }
 
+    public void reset() {
+        cubes.clear();
+        ball1 = new Ball(
+                new Point2D.Float(-0.025f, -0.025f),
+                new Point2D.Float(0.025f, -0.025f),
+                new Point2D.Float(0.025f, 0.025f),
+                new Point2D.Float(-0.025f, 0.025f)
+        );
+        ball2 = null;
+        scoreP1 = -1;
+        scoreP2 = -1;
+
+        scoreP2label.setVisible(false);
+        scoreP1label.setVisible(false);
+        winnerLabel.setVisible(false);
+        highestScoreLabel.setVisible(false);
+
+
+        initCubes();
+        gameState = GameState.WELCOME;
+    }
+
     @Override
     public void reshape(GLAutoDrawable glAutoDrawable, int i, int i1, int i2, int i3) {
 
@@ -520,10 +703,18 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     public void keyPressed(KeyEvent e) {
         if (gameState == GameState.PLAYING) {
             if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+                if (!isMuted) {
+                    Moving.Reset();
+                    Moving.Start();
+                }
                 ball1.isMovingRight = !ball1.isMovingRight;
             }
 
             if (e.getKeyCode() == KeyEvent.VK_A) {
+                if (!isMuted) {
+                    Moving.Reset();
+                    Moving.Start();
+                }
                 if (ball2 != null) {
                     ball2.isMovingRight = !ball2.isMovingRight;
                 }
@@ -561,7 +752,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
             } else {
                 gameState = GameState.CHOOSE_MODE;
             }
-        } else if (gameState == GameState.CHOOSE_MODE){
+        } else if (gameState == GameState.CHOOSE_MODE) {
             if (xPos <= 0.391 && xPos >= 0.091 && yPos <= 0.06 && yPos >= -0.132) {
                 mode = GameMode.SINGLE_PLAYER;
                 gameState = GameState.PLAYING;
@@ -579,18 +770,14 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
             if (xPos <= 0.22 && xPos >= 0.111 && yPos <= 0.05 && yPos >= -0.122) {
                 gameState = GameState.PLAYING;
             } else if (xPos <= 0.05 && xPos >= -0.05 && yPos <= 0.05 && yPos >= -0.122) {
-                cubes.clear();
-                ball1 = new Ball(
-                        new Point2D.Float(-0.025f, -0.025f),
-                        new Point2D.Float(0.025f, -0.025f),
-                        new Point2D.Float(0.025f, 0.025f),
-                        new Point2D.Float(-0.025f, 0.025f)
-                );
-                initCubes();
-                ball2 = null;
-                gameState = GameState.WELCOME;
+                reset();
             } else if (xPos <= -0.111 && xPos >= -0.22 && yPos <= 0.05 && yPos >= -0.122) {
                 isMuted = !isMuted;
+            }
+        } else if (gameState == GameState.GAME_OVER) {
+            if (xPos <= 0.079 && xPos >= -0.076 && yPos <= -0.094 && yPos >= -0.194) {
+                reset();
+                animator.start();
             }
         }
     }
