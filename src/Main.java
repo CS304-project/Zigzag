@@ -26,26 +26,40 @@ public class Main extends JFrame  {
             JLabel scoreP2 = new JLabel("");
             JLabel highestScore = new JLabel("");
             JLabel winner = new JLabel("");
+            Font font = new Font("Myriad Arabic", Font.PLAIN, 24);
 
-            counterLabelP1.setFont(new Font("Myriad Arabic", Font.PLAIN, 24));
+            counterLabelP1.setFont(font);
+            counterLabelP1.setOpaque(true);
+            counterLabelP1.setBackground(Color.white);
 
-            counterLabelP2.setFont(new Font("Myriad Arabic", Font.PLAIN, 24));
+            counterLabelP2.setFont(font);
             counterLabelP2.setForeground(Color.RED);
 
-            scoreLabelP1.setFont(new Font("Myriad Arabic", Font.PLAIN, 24));
-            scoreLabelP2.setFont(new Font("Myriad Arabic", Font.PLAIN, 24));
+            scoreLabelP1.setFont(font);
+            scoreLabelP1.setOpaque(true);
+            scoreLabelP1.setBackground(Color.WHITE);
+            scoreLabelP2.setFont(font);
             scoreLabelP2.setForeground(Color.RED);
+            scoreP1.setFont(font);
+            scoreP2.setFont(font);
+            highestScore.setFont(font);
+            winner.setFont(font);
+
+
+
 
             jPanelP1.add(scoreLabelP1);
             jPanelP1.add(counterLabelP1);
             jPanelP1.setBounds(1080, 0, 150, 40);
-            jPanelP1.setOpaque(false);
+            jPanelP1.setOpaque(true);
+            jPanelP1.setBackground(new Color(255,255,255));
             jPanelP1.setVisible(false);
 
             jPanelP2.add(scoreLabelP2);
             jPanelP2.add(counterLabelP2);
             jPanelP2.setBounds(0, 0, 150, 40);
-            jPanelP2.setOpaque(false);
+            jPanelP2.setOpaque(true);
+            jPanelP2.setBackground(new Color(255,255,255));
             jPanelP2.setVisible(false);
 
             listener.setScorePanelP1(jPanelP1);
