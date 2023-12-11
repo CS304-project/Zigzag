@@ -38,6 +38,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     private JLabel winnerLabel;
     private JPanel scorePanelP1;
     private JPanel scorePanelP2;
+    private Color pink = new Color(255, 159, 245);
     private final File txtFile;
     Integer scoreP1 = -1;
     Integer scoreP2 = -1;
@@ -261,6 +262,10 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
                     updateScore();
                 }
                 drawGameOverMenuS(gl);
+                scoreP1label.setOpaque(true);
+                scoreP1label.setBackground(pink);
+                highestScoreLabel.setOpaque(true);
+                highestScoreLabel.setBackground(pink);
                 scoreP1label.setBounds(700, 306, 50, 50);
                 scoreP1label.setText(scoreP1.toString());
                 highestScoreLabel.setBounds(750,360,50,50);
@@ -269,6 +274,12 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
                 highestScoreLabel.setVisible(true);
             } else {
                 drawGameOverMenuM(gl);
+                scoreP1label.setOpaque(true);
+                scoreP1label.setBackground(pink);
+                scoreP2label.setOpaque(true);
+                scoreP2label.setBackground(pink);
+                winnerLabel.setOpaque(true);
+                winnerLabel.setBackground(pink);
                 scoreP1label.setBounds(670, 280, 50, 50);
                 scoreP1label.setText(scoreP1.toString());
                 scoreP2label.setBounds(670, 335, 50, 50);
