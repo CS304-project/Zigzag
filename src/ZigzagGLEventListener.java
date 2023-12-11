@@ -1031,7 +1031,13 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
 
     @Override
     public void keyPressed(KeyEvent e) {
-        keyBits.set(e.getKeyCode());
+        if (e.getKeyCode() != KeyEvent.VK_ESCAPE) {
+            keyBits.set(e.getKeyCode());
+        } else if (gameState == GameState.PLAYING){
+            gameState = GameState.PAUSED;
+        } else if (gameState == GameState.PAUSED){
+            gameState = GameState.PLAYING;
+        }
     }
 
     @Override
