@@ -1,3 +1,4 @@
+import Config.Difficulty;
 import Config.GameState;
 import Config.GameMode;
 import Model.Ball;
@@ -48,11 +49,12 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     private GameMode mode;
     boolean isMuted = false;
     boolean isInfoMenuOpen = false;
+    private Difficulty difficulty;
     private final String[] textureNames = {
             "Ball//ball.png", "Diamond//WithShadow//Diamond_with_shadow.png", "Home//Info.png", "Pause//Play_button.png",
             "Home//sound_On.png", "Home//TapToPlay.png", "Home//title.png", "EndGame//GameOver.png", "Ball//ball2.png",
             "Pause//Background.png", "Pause//home.png", "GameMode//multiPlayer.png", "GameMode//singlePlayer.png",
-            "Home//sound_Off.png", "EndGame//GameOverM.png", "Home//Info_Menu.png"
+            "Home//sound_Off.png", "EndGame//GameOverM.png", "Home//Info_Menu.png", "Home//levels.png"
     };
     private final Sound Tap;
     private final Sound Moving;
@@ -242,11 +244,29 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
             drawTitle(gl);
             multiPlayerBTN(gl);
             singlePlayerBTN(gl);
-        } else if (gameState == GameState.PLAYING) {
+        } else if (gameState == GameState.CHOOSE_DIFFICULTY) {
+            gl.glClear(GL.GL_COLOR_BUFFER_BIT);
+
+            for (int i = cubes.size() - 1; i >= 0; i--) {
+                Cube cube = cubes.get(i);
+
+                cube.drawCube(gl, textures[1]);
+            }
+            ball1.drawBall(gl, textures[0]);
+
+            drawTitle(gl);
+            drawDifficultyMenu(gl);
+        }else if (gameState == GameState.PLAYING) {
             if (!isMuted) Tap.Start();
             gl.glClear(GL.GL_COLOR_BUFFER_BIT);
             scorePanelP1.setVisible(true);
-            drawingAnimatingCubes(gl);
+            if (difficulty == Difficulty.EASY){
+                drawingAnimatingCubes(gl, 0.002f);
+            } else if (difficulty == Difficulty.MEDIUM){
+                drawingAnimatingCubes(gl, 0.003f);
+            } else if (difficulty == Difficulty.HARD){
+                drawingAnimatingCubes(gl, 0.004f);
+            }
             if (mode == GameMode.MULTIPLAYER) {
                 scorePanelP2.setVisible(true);
             }
@@ -305,7 +325,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         }
     }
 
-    public void drawingAnimatingCubes(GL gl) {
+    public void drawingAnimatingCubes(GL gl, float speed) {
         Cube lastCube = cubes.get(cubes.size() - 1);
 
         if (ball1.isFalling) {
@@ -331,19 +351,22 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
                 Cube cube = cubes.get(i);
 
                 if (cube.centralMid.y <= -0.6) {
-                    cube.animateFallingCube(gl, textures[1]);
+                    cube.animateFallingCube(gl, textures[1], speed);
+                    if (cube.diamond != null){
+                        cube.diamond.animateFallingDiamond(speed);
+                    }
                     if (cube.topMid.y <= -1) {
                         cubes.remove(i);
                     }
                 } else {
                     cube.drawCube(gl, textures[1]);
-                    cube.animateCube();
+                    cube.animateCube(speed);
                     if (cube.diamond != null)
-                        cube.diamond.animateDiamond();
+                        cube.diamond.animateDiamond(speed);
                 }
             }
-            ball1.navigateBall();
-            if (ball2 != null) ball2.navigateBall();
+            ball1.navigateBall(speed);
+            if (ball2 != null) ball2.navigateBall(speed);
         }
 
         if (mode == GameMode.SINGLE_PLAYER) {
@@ -667,7 +690,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
 
     public void drawInfoMenu(GL gl) {
         gl.glEnable(gl.GL_BLEND);
-        gl.glBindTexture(GL.GL_TEXTURE_2D, textures[textures.length - 1]);
+        gl.glBindTexture(GL.GL_TEXTURE_2D, textures[textures.length - 2]);
         gl.glBegin(gl.GL_QUADS);
         gl.glTexCoord2f(0, 0);
         gl.glVertex2d(-0.5, -0.9);
@@ -677,6 +700,22 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         gl.glVertex2d(0.5, 0.9);
         gl.glTexCoord2f(0, 1);
         gl.glVertex2d(-0.5, 0.9);
+        gl.glEnd();
+        gl.glDisable(GL.GL_BLEND);
+    }
+
+    public void drawDifficultyMenu(GL gl) {
+        gl.glEnable(gl.GL_BLEND);
+        gl.glBindTexture(GL.GL_TEXTURE_2D, textures[textures.length - 1]);
+        gl.glBegin(gl.GL_QUADS);
+        gl.glTexCoord2f(0, 0);
+        gl.glVertex2d(-0.5, -0.75);
+        gl.glTexCoord2f(1, 0);
+        gl.glVertex2d(0.5, -0.75);
+        gl.glTexCoord2f(1, 1);
+        gl.glVertex2d(0.5, 0.75);
+        gl.glTexCoord2f(0, 1);
+        gl.glVertex2d(-0.5, 0.75);
         gl.glEnd();
         gl.glDisable(GL.GL_BLEND);
     }
@@ -747,6 +786,8 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
                 gameState = GameState.PLAYING;
             } else if (gameState == GameState.CHOOSE_MODE) {
                 gameState = GameState.WELCOME;
+            } else if (gameState == GameState.CHOOSE_DIFFICULTY) {
+                gameState = GameState.CHOOSE_MODE;
             }
         }
     }
@@ -778,7 +819,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         } else if (gameState == GameState.CHOOSE_MODE) {
             if (xPos <= 0.391 && xPos >= 0.091 && yPos <= 0.06 && yPos >= -0.132) {
                 mode = GameMode.SINGLE_PLAYER;
-                gameState = GameState.PLAYING;
+                gameState = GameState.CHOOSE_DIFFICULTY;
             } else if (xPos <= -0.091 && xPos >= -0.391 && yPos <= 0.06 && yPos >= -0.132) {
                 ball2 = new Ball(
                         new Point2D.Float(-0.05f, -0.025f),
@@ -787,8 +828,21 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
                         new Point2D.Float(-0.05f, 0.025f)
                 );
                 mode = GameMode.MULTIPLAYER;
+                gameState = GameState.CHOOSE_DIFFICULTY;
+            }
+        } else if (gameState == GameState.CHOOSE_DIFFICULTY) {
+            if (xPos <= 0.102 && xPos >= -0.097 && yPos <= 0.243 && yPos >= 0.130) {
+                difficulty = Difficulty.EASY;
+                gameState = GameState.PLAYING;
+            } else if (xPos <= 0.102 && xPos >= -0.097 && yPos <= 0.057 && yPos >= -0.057) {
+                difficulty = Difficulty.MEDIUM;
+                gameState = GameState.PLAYING;
+            } else if (xPos <= 0.102 && xPos >= -0.097 && yPos <= -0.131 && yPos >= -0.241) {
+                difficulty = Difficulty.HARD;
                 gameState = GameState.PLAYING;
             }
+            System.out.println(xPos);
+            System.out.println(yPos);
         } else if (gameState == GameState.PAUSED) {
             if (xPos <= 0.22 && xPos >= 0.111 && yPos <= 0.05 && yPos >= -0.122) {
                 gameState = GameState.PLAYING;
