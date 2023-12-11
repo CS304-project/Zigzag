@@ -47,11 +47,12 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     GameState gameState = GameState.WELCOME;
     private GameMode mode;
     boolean isMuted = false;
+    boolean isInfoMenuOpen = false;
     private final String[] textureNames = {
             "Ball//ball.png", "Diamond//WithShadow//Diamond_with_shadow.png", "Home//Info.png", "Pause//Play_button.png",
             "Home//sound_On.png", "Home//TapToPlay.png", "Home//title.png", "EndGame//GameOver.png", "Ball//ball2.png",
             "Pause//Background.png", "Pause//home.png", "GameMode//multiPlayer.png", "GameMode//singlePlayer.png",
-            "Home//sound_Off.png", "EndGame//GameOverM.png"
+            "Home//sound_Off.png", "EndGame//GameOverM.png", "Home//Info_Menu.png"
     };
     private final Sound Tap;
     private final Sound Moving;
@@ -225,7 +226,9 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
             drawInfoIcon(gl);
             drawTitle(gl);
             drawClickToPlay(gl);
-
+            if (isInfoMenuOpen){
+                drawInfoMenu(gl);
+            }
         } else if (gameState == GameState.CHOOSE_MODE) {
             gl.glClear(GL.GL_COLOR_BUFFER_BIT);
 
@@ -662,6 +665,22 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         gl.glDisable(GL.GL_BLEND);
     }
 
+    public void drawInfoMenu(GL gl) {
+        gl.glEnable(gl.GL_BLEND);
+        gl.glBindTexture(GL.GL_TEXTURE_2D, textures[textures.length - 1]);
+        gl.glBegin(gl.GL_QUADS);
+        gl.glTexCoord2f(0, 0);
+        gl.glVertex2d(-0.5, -0.9);
+        gl.glTexCoord2f(1, 0);
+        gl.glVertex2d(0.5, -0.9);
+        gl.glTexCoord2f(1, 1);
+        gl.glVertex2d(0.5, 0.9);
+        gl.glTexCoord2f(0, 1);
+        gl.glVertex2d(-0.5, 0.9);
+        gl.glEnd();
+        gl.glDisable(GL.GL_BLEND);
+    }
+
     public void reset() {
         cubes.clear();
         ball1 = new Ball(
@@ -747,9 +766,13 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         float xPos = (x - width / 2) / width;
         float yPos = (height / 2 - y) / height;
         if (gameState == GameState.WELCOME) {
-            if (xPos <= -0.04 && xPos >= -0.108 && yPos <= -0.110 && yPos >= -0.187) {
+            if (xPos <= -0.04 && xPos >= -0.108 && yPos <= -0.110 && yPos >= -0.187 && !isInfoMenuOpen) {
                 isMuted = !isMuted;
-            } else {
+            } else if (xPos <= 0.108 && xPos >= 0.041 && yPos <= -0.110 && yPos >= -0.187 && !isInfoMenuOpen) {
+                isInfoMenuOpen = true;
+            } else if (isInfoMenuOpen && xPos <= 0.08 && xPos >= -0.08 && yPos <= -0.232 && yPos >= -0.354){
+                isInfoMenuOpen = false;
+            } else if (!isInfoMenuOpen){
                 gameState = GameState.CHOOSE_MODE;
             }
         } else if (gameState == GameState.CHOOSE_MODE) {
