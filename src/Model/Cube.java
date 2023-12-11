@@ -56,12 +56,12 @@ public class Cube {
         generateDiamond();
     }
 
-    public void drawCube(GL gl, int texture) {
+    public void draw(GL gl, int texture) {
         drawTile(gl);
         drawRProjection(gl);
         drawLProjection(gl);
         if (diamond != null) {
-            diamond.drawDiamond(gl, texture);
+            diamond.draw(gl, texture);
         }
 
     }
@@ -149,27 +149,27 @@ public class Cube {
         }
     }
 
-    public void animateCube() {
-        topMid.y -= 0.001f;
-        topLeft.y -= 0.001f;
-        centralMid.y -= 0.001f;
-        topRight.y -= 0.001f;
-        botMid.y -= 0.001f;
-        botLeft.y -= 0.001f;
-        botRight.y -= 0.001f;
-        centerTileP.y -= 0.001f;
+    public void animate(float speed) {
+        topMid.y -= speed;
+        topLeft.y -= speed;
+        centralMid.y -= speed;
+        topRight.y -= speed;
+        botMid.y -= speed;
+        botLeft.y -= speed;
+        botRight.y -= speed;
+        centerTileP.y -= speed;
     }
 
-    public void animateFallingCube(GL gl, int texture) {
-        drawCube(gl, texture);
-        topMid.y -= 0.003f;
-        topLeft.y -= 0.003f;
-        centralMid.y -= 0.003f;
-        topRight.y -= 0.003f;
-        botMid.y -= 0.003f;
-        botLeft.y -= 0.003f;
-        botRight.y -= 0.003f;
-        centerTileP.y -= 0.003f;
+    public void animateExiting(GL gl, int texture, float speed) {
+        draw(gl, texture);
+        topMid.y -= speed + 0.002f;
+        topLeft.y -= speed + 0.002f;
+        centralMid.y -= speed + 0.002f;
+        topRight.y -= speed + 0.002f;
+        botMid.y -= speed + 0.002f;
+        botLeft.y -= speed + 0.002f;
+        botRight.y -= speed + 0.002f;
+        centerTileP.y -= speed + 0.002f;
     }
 
     public boolean isInside(Point2D.Float point) {
