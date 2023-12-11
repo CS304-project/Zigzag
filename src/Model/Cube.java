@@ -56,12 +56,12 @@ public class Cube {
         generateDiamond();
     }
 
-    public void drawCube(GL gl, int texture) {
+    public void draw(GL gl, int texture) {
         drawTile(gl);
         drawRProjection(gl);
         drawLProjection(gl);
         if (diamond != null) {
-            diamond.drawDiamond(gl, texture);
+            diamond.draw(gl, texture);
         }
 
     }
@@ -149,7 +149,7 @@ public class Cube {
         }
     }
 
-    public void animateCube(float speed) {
+    public void animate(float speed) {
         topMid.y -= speed;
         topLeft.y -= speed;
         centralMid.y -= speed;
@@ -160,8 +160,8 @@ public class Cube {
         centerTileP.y -= speed;
     }
 
-    public void animateFallingCube(GL gl, int texture, float speed) {
-        drawCube(gl, texture);
+    public void animateExiting(GL gl, int texture, float speed) {
+        draw(gl, texture);
         topMid.y -= speed + 0.002f;
         topLeft.y -= speed + 0.002f;
         centralMid.y -= speed + 0.002f;
