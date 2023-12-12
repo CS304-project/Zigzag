@@ -22,9 +22,10 @@ import java.awt.event.MouseListener;
 import java.awt.geom.Point2D;
 import java.io.*;
 import java.util.*;
-import java.util.Timer;
 
 public class ZigzagGLEventListener implements GLEventListener, KeyListener, MouseListener {
+    int countDownTimer = 3, delay = 0, timerCounter = 0;
+    private JLabel countDownLabel;
     private final ArrayList<Cube> cubes = new ArrayList<>();
     private Ball blackBall;
     private Ball redBall;
@@ -103,6 +104,10 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         }
 
         initCubes();
+    }
+
+    public void setCountDownLabel(JLabel label) {
+        this.countDownLabel = label;
     }
 
     public void setAnimator(FPSAnimator animator) {
@@ -260,20 +265,32 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
 
 
     private void countDown() {
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            int val = countdownVal;
+        delay++;
+        countDownLabel.setBounds(640, 0, 50, 50);
+        countDownLabel.setText("" + countDownTimer);
+        countDownLabel.setVisible(true);
 
-            @Override
-            public void run() {
-                val--;
+        if (delay > 100) {
+            delay = 0;
+            countDownTimer--;
+        }
 
-                if (val < 0) {
-                    timer.cancel();
-                    gameState = GameState.PLAYING;
-                }
-            }
-        }, 0, 1000);
+        if (countDownTimer <= 0) {
+            countDownLabel.setVisible(false);
+            gameState = GameState.PLAYING;
+        }
+    }
+
+    private void timer() {
+        delay++;
+        countDownLabel.setBounds(640, 0, 50, 50);
+        countDownLabel.setText("" + timerCounter);
+        countDownLabel.setVisible(true);
+
+        if (delay > 100) {
+            delay = 0;
+            timerCounter++;
+        }
     }
 
     private void drawPlayingScreen(GL gl) {
@@ -360,6 +377,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
             drawCountDownScreen(gl);
             countDown();
         } else if (gameState == GameState.PLAYING) {
+            timer();
             drawPlayingScreen(gl);
         } else if (gameState == GameState.PAUSED) {
             drawPauseMenu(gl);
@@ -831,6 +849,7 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
 
     public void reset() {
         cubes.clear();
+
         blackBall = new Ball(
                 new Point2D.Float(-0.025f, -0.025f),
                 new Point2D.Float(0.025f, -0.025f),
@@ -840,12 +859,15 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         redBall = null;
         scoreP1 = -1;
         scoreP2 = -1;
+        delay = 0;
+        timerCounter = 0;
+        countDownTimer = 3;
 
         scoreP2label.setVisible(false);
         scoreP1label.setVisible(false);
         winnerLabel.setVisible(false);
         highestScoreLabel.setVisible(false);
-
+        countDownLabel.setVisible(false);
 
         initCubes();
         gameState = GameState.WELCOME;
