@@ -24,7 +24,7 @@ import java.io.*;
 import java.util.*;
 
 public class ZigzagGLEventListener implements GLEventListener, KeyListener, MouseListener {
-    int countDownTimer = 3, delay = 0, timerCounter = 0;
+    private int countDownTimer = 3, delay = 0, timerCounter = 0;
     private JLabel countDownLabel;
     private final ArrayList<Cube> cubes = new ArrayList<>();
     private Ball blackBall;
