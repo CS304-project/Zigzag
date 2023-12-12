@@ -65,7 +65,6 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
     private final BitSet keyBits = new BitSet(256);
     private boolean didBlackBallChangeDirection = false;
     private boolean didRedBallChangeDirection = false;
-    int countdownVal = 3;
 
     public ZigzagGLEventListener() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
         blackBall = new Ball(
