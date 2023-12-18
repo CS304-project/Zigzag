@@ -14,7 +14,7 @@ public class Main extends JFrame {
         try {
             GLCanvas glCanvas = new GLCanvas();
             ZigzagGLEventListener listener = new ZigzagGLEventListener();
-            FPSAnimator animator = new FPSAnimator(glCanvas, 100);
+            FPSAnimator animator = new FPSAnimator(glCanvas, 144);
             JLabel counterLabelP1 = new JLabel();
             JLabel counterLabelP2 = new JLabel();
             JLayeredPane lp = new JLayeredPane();
@@ -29,21 +29,22 @@ public class Main extends JFrame {
             JLabel countDownLabel = new JLabel();
             Font font = new Font("Myriad Arabic", Font.PLAIN, 24);
 
+            Color PINK = new Color(255, 159, 245);
+
             countDownLabel.setFont(font);
-            countDownLabel.setBackground(Color.WHITE);
 
             counterLabelP1.setFont(font);
             counterLabelP1.setOpaque(true);
-            counterLabelP1.setBackground(Color.white);
+            counterLabelP1.setBackground(PINK);
 
             counterLabelP2.setFont(font);
-            counterLabelP2.setForeground(Color.RED);
+            counterLabelP2.setBackground(PINK);
 
             scoreLabelP1.setFont(font);
-            scoreLabelP1.setBackground(Color.WHITE);
+            scoreLabelP1.setBackground(PINK);
 
             scoreLabelP2.setFont(font);
-            scoreLabelP2.setForeground(Color.RED);
+            scoreLabelP2.setBackground(PINK);
 
             gameOverScoreP1Label.setFont(font);
 
@@ -57,14 +58,14 @@ public class Main extends JFrame {
             jPanelP1.add(counterLabelP1);
             jPanelP1.setBounds(1080, 0, 150, 40);
             jPanelP1.setOpaque(true);
-            jPanelP1.setBackground(new Color(255, 255, 255));
+            jPanelP1.setBackground(PINK);
             jPanelP1.setVisible(false);
 
             jPanelP2.add(scoreLabelP2);
             jPanelP2.add(counterLabelP2);
-            jPanelP2.setBounds(0, 0, 150, 40);
+            jPanelP2.setBounds(30, 0, 150, 40);
             jPanelP2.setOpaque(true);
-            jPanelP2.setBackground(new Color(255, 255, 255));
+            jPanelP2.setBackground(PINK);
             jPanelP2.setVisible(false);
 
             listener.setScorePanelP1(jPanelP1);

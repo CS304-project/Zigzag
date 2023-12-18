@@ -24,7 +24,7 @@ import java.io.*;
 import java.util.*;
 
 public class ZigzagGLEventListener implements GLEventListener, KeyListener, MouseListener {
-    private int countDownTimer = 3, delay = 0, timerCounter = 0;
+    private int countDownTimer = 3, delay = 0, timerCounterSec1 = 0, timerCounterSec2 = 0, timerCounterMin1 = 0, timerCounterMin2 = 0;
     private JLabel countDownLabel;
     private final ArrayList<Cube> cubes = new ArrayList<>();
     private Ball blackBall;
@@ -96,7 +96,6 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
 
             if (isDirCreated) {
                 txtFile = new File(file.getAbsolutePath() + "//score.txt");
-                boolean isFile = txtFile.createNewFile();
             } else {
                 txtFile = null;
             }
@@ -247,7 +246,12 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
 
             cube.draw(gl, textures[1]);
         }
-        blackBall.draw(gl, textures[0]);
+        if (mode == GameMode.MULTIPLAYER){
+            blackBall.draw(gl, textures[0]);
+            redBall.draw(gl, textures[8]);
+        }else {
+            blackBall.draw(gl, textures[0]);
+        }
 
         drawTitle(gl);
         drawDifficultyMenu(gl);
@@ -259,17 +263,24 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
             Cube cube = cubes.get(i);
             cube.draw(gl, textures[1]);
         }
-        blackBall.draw(gl, textures[0]);
+        if (mode == GameMode.MULTIPLAYER){
+            blackBall.draw(gl, textures[0]);
+            redBall.draw(gl, textures[8]);
+        }else {
+            blackBall.draw(gl, textures[0]);
+        }
     }
 
 
     private void countDown() {
         delay++;
-        countDownLabel.setBounds(640, 0, 50, 50);
-        countDownLabel.setText("" + countDownTimer);
+        countDownLabel.setOpaque(true);
+        countDownLabel.setBackground(PINK);
+        countDownLabel.setBounds(620, 250, 42, 40);
+        countDownLabel.setText("  " + countDownTimer);
         countDownLabel.setVisible(true);
 
-        if (delay > 100) {
+        if (delay > 144) {
             delay = 0;
             countDownTimer--;
         }
@@ -282,13 +293,27 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
 
     private void timer() {
         delay++;
-        countDownLabel.setBounds(640, 0, 50, 50);
-        countDownLabel.setText("" + timerCounter);
+        countDownLabel.setOpaque(true);
+        countDownLabel.setBackground(PINK);
+        countDownLabel.setBounds(600, 0, 88, 50);
+        countDownLabel.setText(" "+timerCounterMin1+timerCounterMin2 +" : "+timerCounterSec1+timerCounterSec2);
         countDownLabel.setVisible(true);
 
-        if (delay > 100) {
+        if (delay > 144) {
             delay = 0;
-            timerCounter++;
+            timerCounterSec2++;
+        }
+        if (timerCounterSec2 > 9){
+            timerCounterSec2 = 0;
+            timerCounterSec1++;
+        }
+        if (timerCounterSec1 == 6 && timerCounterSec2 == 0) {
+            timerCounterSec1 = 0;
+            timerCounterMin2 ++;
+        }
+        if (timerCounterMin2 > 9){
+            timerCounterMin2 = 0;
+            timerCounterMin1++;
         }
     }
 
@@ -299,9 +324,9 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         if (difficulty == GameDifficulty.EASY) {
             handleCubesAndBallsAnimation(gl, 0.002f);
         } else if (difficulty == GameDifficulty.MEDIUM) {
-            handleCubesAndBallsAnimation(gl, 0.004f);
+            handleCubesAndBallsAnimation(gl, 0.003f);
         } else if (difficulty == GameDifficulty.HARD) {
-            handleCubesAndBallsAnimation(gl, 0.006f);
+            handleCubesAndBallsAnimation(gl, 0.004f);
         }
 
         if (mode == GameMode.MULTIPLAYER) {
@@ -321,10 +346,10 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         scoreP1label.setBackground(PINK);
         highestScoreLabel.setOpaque(true);
         highestScoreLabel.setBackground(PINK);
-        scoreP1label.setBounds(700, 306, 50, 50);
-        scoreP1label.setText(scoreP1.toString());
-        highestScoreLabel.setBounds(750, 360, 50, 50);
-        highestScoreLabel.setText(highestScore);
+        scoreP1label.setBounds(700, 306, 60, 50);
+        scoreP1label.setText(" "+scoreP1.toString());
+        highestScoreLabel.setBounds(750, 360, 60, 50);
+        highestScoreLabel.setText(" "+highestScore);
         scoreP1label.setVisible(true);
         highestScoreLabel.setVisible(true);
     }
@@ -336,12 +361,12 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         scoreP2label.setBackground(PINK);
         winnerLabel.setOpaque(true);
         winnerLabel.setBackground(PINK);
-        scoreP1label.setBounds(670, 280, 50, 50);
-        scoreP1label.setText(scoreP1.toString());
-        scoreP2label.setBounds(670, 335, 50, 50);
-        scoreP2label.setText(scoreP2.toString());
-        winnerLabel.setBounds(720, 402, 70, 50);
-        winnerLabel.setText(redBall.isFalling ? "Black" : blackBall.isFalling ? "Red" : "Draw");
+        scoreP1label.setBounds(670, 280, 60, 50);
+        scoreP1label.setText(" "+scoreP1.toString());
+        scoreP2label.setBounds(670, 335, 60, 50);
+        scoreP2label.setText(" "+scoreP2.toString());
+        winnerLabel.setBounds(720, 402, 73, 50);
+        winnerLabel.setText(redBall.isFalling ? " Black" : blackBall.isFalling ? " Red" : " Draw");
         scoreP1label.setVisible(true);
         scoreP2label.setVisible(true);
         winnerLabel.setVisible(true);
@@ -859,7 +884,10 @@ public class ZigzagGLEventListener implements GLEventListener, KeyListener, Mous
         scoreP1 = -1;
         scoreP2 = -1;
         delay = 0;
-        timerCounter = 0;
+        timerCounterSec1 = 0;
+        timerCounterSec2 = 0;
+        timerCounterMin1 = 0;
+        timerCounterMin2 = 0;
         countDownTimer = 3;
 
         scoreP2label.setVisible(false);
